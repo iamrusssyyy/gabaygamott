@@ -20,6 +20,8 @@ require_once __DIR__ . '/labels.php';         // status names and badges
 require_once __DIR__ . '/csrf.php';           // csrf_field(), verify_csrf()
 require_once __DIR__ . '/auth.php';           // current_user(), require_role(), login/logout
 require_once __DIR__ . '/alerts.php';         // run_alert_checks() — near-expiry and low-stock alerts
+require_once __DIR__ . '/upload.php';         // save_upload() — safe file uploads
+require_once __DIR__ . '/requests.php';       // load_request(), change_request_status()
 
 // ---------------------------------------------------------------------
 // SESSION = a small storage area on the server for each visitor.

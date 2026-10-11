@@ -90,6 +90,62 @@ a {
     background: #6c757d;
 }
 
+/* Outline buttons in our green (used by the "How much is left?" choices) */
+.btn-outline-primary {
+    --bs-btn-color: var(--gg-green);
+    --bs-btn-border-color: var(--gg-green);
+    --bs-btn-hover-bg: var(--gg-green);
+    --bs-btn-hover-border-color: var(--gg-green);
+    --bs-btn-active-bg: var(--gg-green);
+    --bs-btn-active-border-color: var(--gg-green);
+}
+
+/* ---------- Request wizard ---------- */
+.progress-rail li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0;
+    color: #6c757d;
+}
+.progress-rail .rail-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 2px solid #c9d6d0;
+    background: #fff;
+    font-weight: 600;
+}
+.progress-rail li.done .rail-number {
+    background: #e8f1ee;
+    border-color: var(--gg-green);
+    color: var(--gg-green);
+}
+.progress-rail li.current {
+    color: #1d2a26;
+    font-weight: 600;
+}
+.progress-rail li.current .rail-number {
+    background: var(--gg-green);
+    border-color: var(--gg-green);
+    color: #fff;
+}
+/* On desktop the help panel stays visible while scrolling */
+@media (min-width: 992px) {
+    .help-panel {
+        position: sticky;
+        top: 1rem;
+    }
+}
+/* Status timeline: a line down the left side */
+.timeline li {
+    border-left: 3px solid #c9d6d0;
+    padding-left: 0.75rem;
+}
+
 /* ---------- Home page ---------- */
 .door {
     border-width: 2px;
