@@ -30,7 +30,8 @@ function current_user(): ?array
 
         if (isset($_SESSION['user_id'])) {
             $stmt = db()->prepare(
-                'SELECT id, role, full_name, email, status FROM users WHERE id = ?'
+                'SELECT id, role, full_name, email, phone, city, partner_program_id, status
+                 FROM users WHERE id = ?'
             );
             $stmt->execute([$_SESSION['user_id']]);
             $row = $stmt->fetch();
@@ -94,6 +95,9 @@ function login_user(array $user): void
 
     $stmt = db()->prepare('UPDATE users SET last_login_at = NOW() WHERE id = ?');
     $stmt->execute([$user['id']]);
+
+    // Good moment to send any new near-expiry / low-stock alerts.
+    run_alert_checks();
 }
 
 /**

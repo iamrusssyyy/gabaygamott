@@ -132,6 +132,9 @@ CREATE TABLE pharmacy_stock (
     price                DECIMAL(10,2) NOT NULL,   -- pesos per unit
     low_stock_threshold  INT UNSIGNED NOT NULL DEFAULT 20,
     last_updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    -- When the "low stock" alert was sent (NULL = not sent yet). Cleared
+    -- again when the pharmacy restocks above the threshold.
+    low_stock_alert_sent_at DATETIME NULL,
     -- A pharmacy can list each medicine only once:
     UNIQUE KEY uq_stock_item (pharmacy_id, medicine_id),
     KEY idx_stock_medicine (medicine_id),
@@ -270,6 +273,7 @@ CREATE TABLE donations (
     rejection_reason      VARCHAR(255) NULL,
     reviewed_by           INT UNSIGNED NULL,       -- admin who approved/rejected
     reviewed_at           DATETIME     NULL,
+    expiry_alert_sent_at  DATETIME     NULL,       -- when the near-expiry alert was sent
 
     created_at            DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at            DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

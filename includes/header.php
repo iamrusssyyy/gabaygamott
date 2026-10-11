@@ -4,14 +4,67 @@
 // Before including it, a page may set:
 //   $page_title    text for the browser tab
 //   $use_map       true to load the Leaflet map library
+//   $use_charts    true to load the Chart.js library
 //   $page_scripts  list of our own JS files, e.g. ['assets/js/register.js']
 //                  (loaded by includes/footer.php)
 // =====================================================================
 
 $page_title = $page_title ?? APP_NAME;
 $use_map    = $use_map ?? false;
+$use_charts = $use_charts ?? false;
 $nav_user   = current_user();
 $flash      = get_flash();
+
+// Menu links. Visitors who are not logged in see the public links
+// (the protected ones send them to the login page first).
+$nav_links_by_role = [
+    'guest' => [
+        'locator/search.php'          => 'Find medicine',
+        'beneficiary/request_new.php' => 'Get assistance',
+        'beneficiary/dashboard.php'   => 'Track request',
+        'donor/donation_new.php'      => 'Donate',
+    ],
+    'beneficiary' => [
+        'locator/search.php'          => 'Find medicine',
+        'beneficiary/request_new.php' => 'Get assistance',
+        'beneficiary/dashboard.php'   => 'My requests',
+    ],
+    'donor' => [
+        'locator/search.php'     => 'Find medicine',
+        'donor/donation_new.php' => 'Donate',
+        'donor/dashboard.php'    => 'My donations',
+    ],
+    'pharmacy' => [
+        'pharmacy/dashboard.php' => 'Dashboard',
+        'pharmacy/stock.php'     => 'My stock',
+        'donor/donation_new.php' => 'Donate',
+        'locator/search.php'     => 'Find medicine',
+    ],
+    'partner' => [
+        'partner/dashboard.php' => 'Matched requests',
+        'locator/search.php'    => 'Find medicine',
+    ],
+    'admin' => [
+        'admin/dashboard.php' => 'Dashboard',
+        'admin/requests.php'  => 'Requests',
+        'admin/donations.php' => 'Donations',
+        'admin/users.php'     => 'Accounts',
+        'admin/medicines.php' => 'Medicines',
+        'admin/reports.php'   => 'Reports',
+    ],
+];
+$nav_links = $nav_links_by_role[$nav_user['role'] ?? 'guest'];
+
+// Number of unread notifications, shown next to the bell
+$unread_count = 0;
+if ($nav_user) {
+    $stmt = db()->prepare('SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0');
+    $stmt->execute([$nav_user['id']]);
+    $unread_count = (int) $stmt->fetchColumn();
+}
+
+// Path of the page being shown, to highlight the current menu link
+$current_path = $_SERVER['SCRIPT_NAME'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -45,7 +98,7 @@ $flash      = get_flash();
 </head>
 <body>
 
-<nav class="navbar navbar-expand-md bg-white border-bottom">
+<nav class="navbar navbar-expand-lg bg-white border-bottom">
     <div class="container">
         <a class="navbar-brand fw-bold" href="<?= e(url('index.php')) ?>"><?= e(APP_NAME) ?></a>
 
@@ -57,10 +110,26 @@ $flash      = get_flash();
         </button>
 
         <div class="collapse navbar-collapse" id="mainNav">
-            <ul class="navbar-nav ms-auto align-items-md-center gap-md-2">
+            <ul class="navbar-nav me-auto">
+                <?php foreach ($nav_links as $path => $label): ?>
+                    <?php $is_current = ($current_path === url($path)); ?>
+                    <li class="nav-item">
+                        <a class="nav-link<?= $is_current ? ' active fw-semibold' : '' ?>"
+                           href="<?= e(url($path)) ?>"
+                           <?= $is_current ? 'aria-current="page"' : '' ?>><?= e($label) ?></a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+
+            <ul class="navbar-nav align-items-lg-center gap-lg-2">
                 <?php if ($nav_user): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= e(url(ROLE_HOME[$nav_user['role']])) ?>">My dashboard</a>
+                        <a class="nav-link" href="<?= e(url('notifications.php')) ?>">
+                            Notifications
+                            <?php if ($unread_count > 0): ?>
+                                <span class="badge rounded-pill text-bg-danger"><?= $unread_count ?></span>
+                            <?php endif; ?>
+                        </a>
                     </li>
                     <li class="nav-item">
                         <span class="navbar-text small">

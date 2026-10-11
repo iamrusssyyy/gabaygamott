@@ -15,9 +15,11 @@ if (!file_exists(__DIR__ . '/../config/db.php')) {
 require_once __DIR__ . '/../config/db.php';   // DB_HOST, DB_NAME, DB_USER, DB_PASS
 require_once __DIR__ . '/../config/app.php';  // BASE_URL, cities, upload settings
 require_once __DIR__ . '/db.php';             // db() — the database connection
-require_once __DIR__ . '/helpers.php';        // e(), url(), redirect(), flash messages
+require_once __DIR__ . '/helpers.php';        // e(), url(), redirect(), flash messages, notify()
+require_once __DIR__ . '/labels.php';         // status names and badges
 require_once __DIR__ . '/csrf.php';           // csrf_field(), verify_csrf()
 require_once __DIR__ . '/auth.php';           // current_user(), require_role(), login/logout
+require_once __DIR__ . '/alerts.php';         // run_alert_checks() — near-expiry and low-stock alerts
 
 // ---------------------------------------------------------------------
 // SESSION = a small storage area on the server for each visitor.

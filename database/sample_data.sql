@@ -271,3 +271,8 @@ INSERT INTO notifications (user_id, message, link, is_read, created_at) VALUES
 (3, 'Your request GG-2026-000003 was matched with the Philippine Cancer Society.', 'beneficiary/request_view.php?id=3', 1, NOW() - INTERVAL 5 DAY),
 (4, 'Your donation #6 was not accepted: packaging is already opened.', 'donor/donation_view.php?id=6', 0, NOW() - INTERVAL 9 DAY),
 (9, 'Low stock: Losartan Potassium 50 mg (18 left). Please update your stock.', 'pharmacy/stock.php', 0, NOW() - INTERVAL 2 HOUR);
+
+-- The Losartan low-stock alert above was already sent, so mark it.
+-- (Other low items will be alerted automatically the next time someone logs in.)
+UPDATE pharmacy_stock SET low_stock_alert_sent_at = NOW() - INTERVAL 2 HOUR
+WHERE pharmacy_id = 2 AND medicine_id = 1;

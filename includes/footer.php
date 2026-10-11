@@ -23,6 +23,13 @@
         crossorigin="anonymous"></script>
 <?php endif; ?>
 
+<?php if ($use_charts ?? false): ?>
+<!-- Chart.js library (only on pages that show charts) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
+        integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4"
+        crossorigin="anonymous"></script>
+<?php endif; ?>
+
 <?php foreach ($page_scripts ?? [] as $script): ?>
 <script src="<?= e(url($script)) ?>"></script>
 <?php endforeach; ?>

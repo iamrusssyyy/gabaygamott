@@ -129,6 +129,9 @@ asking.
 - **Work in small steps.** After each step, explain exactly how to test it in the
   browser (URL, account to log in with, what to click, what should happen), then
   **stop and wait**.
+  - *Update 2026-10-12:* the student asked Claude to build the remaining modules
+    through to the end without stopping for permission between steps. Still commit
+    after each working feature and give browser test instructions at the end.
 - **Use Git and commit after each working feature** with a clear message.
 - Explain design decisions in simple terms the student can repeat to the panel.
 - Don't add features outside this scope without asking.

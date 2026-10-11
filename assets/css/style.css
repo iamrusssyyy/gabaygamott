@@ -61,6 +61,25 @@ a {
     border-radius: 0.5rem;
 }
 
+/* Unread notification: green bar on the left */
+.unread-note {
+    border-left: 4px solid var(--gg-green);
+}
+
+/* The ● in "● In stock" */
+.stock-dot {
+    font-size: 1.1em;
+    line-height: 1;
+}
+
+/* Bootstrap's "primary" badge and text use our green too */
+.text-bg-primary {
+    background-color: var(--gg-green) !important;
+}
+.text-primary {
+    color: var(--gg-green) !important;
+}
+
 /* Bigger tap targets on forms, for older users and phones */
 .form-control,
 .form-select,
