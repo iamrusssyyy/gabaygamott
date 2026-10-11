@@ -160,6 +160,35 @@ a {
     font-size: 0.9rem;
 }
 
+/* ---------- Admin dashboard and reports ---------- */
+.kpi-value {
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+.chart-box {
+    position: relative;
+    height: 280px;
+}
+
+/* When printing (reports): hide the menu, buttons, and footer */
+@media print {
+    nav, footer, .no-print {
+        display: none !important;
+    }
+    body {
+        background: #fff;
+    }
+    .card {
+        break-inside: avoid;
+        border-color: #999 !important;
+    }
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+}
+
 /* Unread notification: green bar on the left */
 .unread-note {
     border-left: 4px solid var(--gg-green);
