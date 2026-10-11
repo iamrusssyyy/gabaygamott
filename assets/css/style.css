@@ -61,6 +61,49 @@ a {
     border-radius: 0.5rem;
 }
 
+/* ---------- Medicine Locator ---------- */
+.search-box {
+    min-width: 220px;
+}
+#results-map {
+    height: 520px;
+    border-radius: 0.5rem;
+}
+.best-pick {
+    border-color: var(--gg-green);
+    background-color: #f1f7f4;
+}
+/* Price label used as a map pin */
+.price-pin {
+    display: inline-block;
+    background: var(--gg-green);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    white-space: nowrap;
+}
+.price-pin-out {
+    background: #6c757d;
+}
+
+/* ---------- Home page ---------- */
+.door {
+    border-width: 2px;
+}
+.program-chip {
+    display: inline-block;
+    border: 1px solid #c9d6d0;
+    background: #fff;
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+    margin: 0 0.35rem 0.5rem 0;
+    font-size: 0.9rem;
+}
+
 /* Unread notification: green bar on the left */
 .unread-note {
     border-left: 4px solid var(--gg-green);

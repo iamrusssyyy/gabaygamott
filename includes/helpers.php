@@ -126,6 +126,30 @@ function medicine_name(array $row): string
 }
 
 /**
+ * Straight-line distance in kilometers between two map points, using the
+ * HAVERSINE formula (the standard way to measure distance on a sphere,
+ * like the Earth, from latitude/longitude). Road distance will be longer.
+ */
+function distance_km(float $lat1, float $lng1, float $lat2, float $lng2): float
+{
+    $earth_radius_km = 6371;
+    $d_lat = deg2rad($lat2 - $lat1);
+    $d_lng = deg2rad($lng2 - $lng1);
+    $a = sin($d_lat / 2) ** 2
+       + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($d_lng / 2) ** 2;
+    return $earth_radius_km * 2 * atan2(sqrt($a), sqrt(1 - $a));
+}
+
+/**
+ * Link that opens turn-by-turn directions to a place.
+ * We use Google Maps here because it opens the Maps app on most phones.
+ */
+function directions_url($latitude, $longitude): string
+{
+    return 'https://www.google.com/maps/dir/?api=1&destination=' . $latitude . ',' . $longitude;
+}
+
+/**
  * Turns a text box into a whole number, or null if it isn't one.
  *   to_int('60') -> 60,  to_int('abc') -> null,  to_int('2.5') -> null
  */
