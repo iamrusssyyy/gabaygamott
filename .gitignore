@@ -1,0 +1,13 @@
+# Real database credentials (copy config/db.example.php to config/db.php)
+config/db.php
+
+# Uploaded files must never be committed (they are personal data under RA 10173).
+# They normally live outside this folder, but ignore these just in case.
+uploads/
+gabaygamot_uploads/
+
+# Editor / OS files
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
