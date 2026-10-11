@@ -49,6 +49,22 @@ function current_user(): ?array
 }
 
 /**
+ * For pharmacy accounts: the pharmacy (store) this account manages.
+ * Every pharmacy page uses this id in its queries, e.g.
+ * "... WHERE pharmacy_id = ?", so a pharmacy can only change ITS OWN stock.
+ */
+function current_pharmacy(): ?array
+{
+    $user = current_user();
+    if (!$user || $user['role'] !== 'pharmacy') {
+        return null;
+    }
+    $stmt = db()->prepare('SELECT * FROM pharmacies WHERE user_id = ?');
+    $stmt->execute([$user['id']]);
+    return $stmt->fetch() ?: null;
+}
+
+/**
  * Put at the top of pages that need ANY logged-in user.
  */
 function require_login(): void

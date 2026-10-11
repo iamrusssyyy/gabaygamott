@@ -122,6 +122,8 @@ asking.
 - Use the exact table and column names in `database/schema.sql`. If the schema must
   change, update `schema.sql` (and `sample_data.sql`) and tell the student.
 - No inline SQL string concatenation, no `eval`, no `extract()`.
+- PDO sends `?` values as text. Don't compare two `?` values with each other in SQL
+  (`'100' > '20'` is false as text); compare columns, or compare in PHP.
 - Never write the PHP closing tag `?>` inside a `//` or `#` comment — PHP ends the
   code block there and prints the rest of the file as text.
 

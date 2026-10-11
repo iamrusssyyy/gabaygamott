@@ -98,6 +98,12 @@ const DOC_TYPES = [
     'valid_id'              => ['label' => 'Valid ID',                 'required' => false],
 ];
 
+// Medicine catalog choices (admin/medicines.php)
+const DOSAGE_FORMS = ['tablet', 'capsule', 'syrup', 'suspension', 'inhaler', 'injection',
+                      'cream', 'ointment', 'drops', 'sachet'];
+// "Unit" = what one price and one quantity refer to, e.g. ₱6.50 per tablet
+const UNITS = ['tablet', 'capsule', 'bottle', 'inhaler', 'vial', 'ampule', 'tube', 'sachet', 'piece'];
+
 /** Colored badge for a request status, e.g. <span class="badge ...">Matched</span> */
 function request_badge(string $status): string
 {
