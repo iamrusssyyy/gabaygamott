@@ -138,6 +138,33 @@ asking.
 - Explain design decisions in simple terms the student can repeat to the panel.
 - Don't add features outside this scope without asking.
 
+## Project status and file map (as of 2026-10-12)
+All three modules are built. Where things live:
+
+| Path | What it does |
+|------|--------------|
+| `index.php` | Home page, wireframe 1b/2b "Two doors" |
+| `login.php`, `logout.php`, `register.php`, `privacy.php`, `notifications.php` | Accounts, consent notice, in-app notifications |
+| `config/app.php` | Base URL, upload folder, Metro Manila cities, donation rules, help line |
+| `includes/init.php` | Loaded first by every page; loads everything below and starts the session |
+| `includes/db.php`, `helpers.php`, `csrf.php`, `auth.php` | `db()`, `e()`/`url()`/`notify()`…, CSRF, `require_role()` |
+| `includes/labels.php` | Status names/colors, dropdown choices, badge helpers |
+| `includes/upload.php` | `save_upload()` (finfo type check, 5 MB, random names, outside htdocs) |
+| `includes/requests.php` | Request loading, allowed status transitions, `process_request_action()` |
+| `includes/request_details.php`, `request_actions.php` | Shared request details/timeline and action buttons |
+| `includes/alerts.php` | Automated near-expiry and low-stock alerts (`run_alert_checks()`) |
+| `locator/search.php` + `assets/js/locator.js` | Public Medicine Locator, wireframe 2e (list/map, filters, best picks) |
+| `beneficiary/` | `request_new.php` 4-step wizard (2h), `request_view.php` tracking, `dashboard.php` |
+| `donor/` | `donation_new.php`, `donation_view.php`, `dashboard.php` (pharmacies may donate too) |
+| `pharmacy/` | `stock.php` stock and price updates, `dashboard.php` |
+| `partner/` | `dashboard.php`, `request_view.php` (only requests matched to their program) |
+| `admin/` | `dashboard.php` (KPIs, alerts, Chart.js), `requests.php`, `request_view.php` (actions and donation routing), `donations.php`, `donation_view.php` (checklist), `users.php` (approvals), `medicines.php` (catalog), `reports.php` (printable) |
+| `files/view.php` | The only way to open uploaded files (permission check) |
+
+Uploaded files are saved in `C:\xampp\gabaygamot_uploads\requests` and `\donations`.
+To reset the data: re-import `database/schema.sql`, then `database/sample_data.sql`
+(this deletes every account and record created since the last import).
+
 ## Test accounts (sample data only — `database/sample_data.sql`)
 | Role        | Email                         | Password         |
 |-------------|-------------------------------|------------------|
