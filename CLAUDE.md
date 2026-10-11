@@ -32,9 +32,12 @@ code comment.
 1. **PDO with prepared statements** for every query. Never put user input directly
    in SQL — not even in `ORDER BY` (use a whitelist of allowed column names instead).
 2. **`password_hash()` / `password_verify()`** for passwords. Never store plain text.
-3. **Sessions for login.** Every protected page starts by including the shared auth
-   helper (`includes/auth.php`) and calling the role check, e.g.
-   `require_role(['admin']);`. Call `session_regenerate_id(true)` after login.
+3. **Sessions for login.** Every page starts with
+   `require_once __DIR__ . '/../includes/init.php';` (it loads config, the database,
+   helpers, CSRF, and the auth helper `includes/auth.php`, and starts the session).
+   Protected pages then call the role check, e.g. `require_role(['admin']);`.
+   Call `session_regenerate_id(true)` after login. Log out only via a POST form
+   with a CSRF token.
 4. **`htmlspecialchars()` on all user output** (use the shared `e()` helper).
 5. **CSRF token on every POST form**, checked before any processing.
 6. **Uploaded documents** (prescriptions, certificates of indigency, IDs, packaging
@@ -94,6 +97,14 @@ Out of scope (Chapter 1.5): physical delivery/courier logistics, payment process
 medical consultation or prescribing. Do not add features outside this scope without
 asking.
 
+## Decisions made with the student (2026-10-12)
+- **Language:** English UI with Filipino **helper lines only** (as in the
+  wireframes). No full EN/FIL translation toggle.
+- **Track request:** **login required**; a beneficiary sees only their own requests.
+- **One medicine per request** (the wizard asks for a single medicine).
+- **Wireframe directions to build:** landing **1b/2b "Two doors"**, search results
+  **1e/2e "List + filter sidebar"**, request form **1h/2h "4-step wizard"**.
+
 ## UI notes from the wireframes
 - Mobile-first (360px), then desktop (1280px). Large tap targets; plain language.
 - Show bilingual helper text where the wireframes do (English + Filipino),
@@ -111,6 +122,8 @@ asking.
 - Use the exact table and column names in `database/schema.sql`. If the schema must
   change, update `schema.sql` (and `sample_data.sql`) and tell the student.
 - No inline SQL string concatenation, no `eval`, no `extract()`.
+- Never write the PHP closing tag `?>` inside a `//` or `#` comment — PHP ends the
+  code block there and prints the rest of the file as text.
 
 ## How to work with the student
 - **Work in small steps.** After each step, explain exactly how to test it in the

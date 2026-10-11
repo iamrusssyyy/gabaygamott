@@ -1,0 +1,50 @@
+/* =====================================================================
+   GabayGamot styles — small additions on top of Bootstrap 5.
+   Colors are defined once here as CSS variables ("--name: value") so
+   we can change the whole theme in one place.
+   ===================================================================== */
+
+:root {
+    --gg-green: #1f6b55;        /* main brand color (buttons, links) */
+    --gg-green-dark: #174f3f;   /* hover / pressed */
+    --gg-cream: #f6f3ec;        /* soft page background */
+}
+
+body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    background-color: var(--gg-cream);
+    color: #1d2a26;
+}
+
+a {
+    color: var(--gg-green);
+}
+
+/* Bootstrap 5.3 buttons read their colors from these --bs-btn-* variables,
+   so we only need to swap the values to use our green. */
+.btn-primary {
+    --bs-btn-bg: var(--gg-green);
+    --bs-btn-border-color: var(--gg-green);
+    --bs-btn-hover-bg: var(--gg-green-dark);
+    --bs-btn-hover-border-color: var(--gg-green-dark);
+    --bs-btn-active-bg: var(--gg-green-dark);
+    --bs-btn-active-border-color: var(--gg-green-dark);
+    --bs-btn-disabled-bg: var(--gg-green);
+    --bs-btn-disabled-border-color: var(--gg-green);
+}
+
+/* Centered card used by the login page */
+.auth-card {
+    max-width: 420px;
+    margin: 2rem auto;
+}
+
+/* Bigger tap targets on forms, for older users and phones */
+.form-control,
+.form-select,
+.btn {
+    min-height: 44px;
+}
+.btn-sm {
+    min-height: 0;
+}

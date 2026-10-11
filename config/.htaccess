@@ -1,0 +1,2 @@
+# Block all web access to this folder. PHP can still include these files.
+Require all denied
