@@ -130,6 +130,115 @@ function change_request_status(array $request, string $new_status, ?string $note
     return '';
 }
 
+// The action buttons on the admin/partner request pages, and the status
+// each one moves the request to.
+const REQUEST_ACTIONS = [
+    'verify'        => 'verified',
+    'match'         => 'matched',
+    'ready'         => 'ready_to_claim',
+    'claimed'       => 'claimed',
+    'action_needed' => 'action_needed',
+    'reject'        => 'rejected',
+];
+
+/**
+ * Handles an action button pressed on admin/request_view.php or
+ * partner/request_view.php. $allowed_actions lists what this role may do:
+ *   admin:   all of REQUEST_ACTIONS
+ *   partner: 'ready', 'claimed', 'action_needed'
+ * Returns '' on success or an error message.
+ */
+function process_request_action(array $request, array $allowed_actions): string
+{
+    $action = post('action');
+    $note   = mb_substr(post('note'), 0, 255);
+
+    if (!in_array($action, $allowed_actions, true) || !isset(REQUEST_ACTIONS[$action])) {
+        return 'You are not allowed to do that.';
+    }
+
+    if ($action === 'verify') {
+        return change_request_status($request, 'verified', $note !== '' ? $note : 'Documents complete.');
+    }
+
+    if ($action === 'action_needed' || $action === 'reject') {
+        if ($note === '') {
+            return $action === 'reject'
+                ? 'Please write the reason for not approving.'
+                : 'Please write what the beneficiary needs to do.';
+        }
+        return change_request_status($request, REQUEST_ACTIONS[$action], $note);
+    }
+
+    if ($action === 'match') {
+        // A program is optional if donated medicine was already routed
+        $program_id = to_int(post('partner_program_id'));
+        $program = null;
+        if ($program_id) {
+            $stmt = db()->prepare('SELECT id, name FROM partner_programs WHERE id = ? AND is_active = 1');
+            $stmt->execute([$program_id]);
+            $program = $stmt->fetch();
+            if (!$program) {
+                return 'Please choose a program from the list.';
+            }
+        }
+        if (!$program && (int) $request['allocated_units'] === 0) {
+            return 'Choose a partner program, or route donated medicine to this request first.';
+        }
+        $text = $note !== '' ? $note : 'Matched with ' . ($program ? $program['name'] : 'donated medicine') . '.';
+        $error = change_request_status($request, 'matched', $text,
+                                       ['partner_program_id' => $program ? (int) $program['id'] : null]);
+
+        // Tell that program's coordinators they have a new request
+        if ($error === '' && $program) {
+            $stmt = db()->prepare("SELECT id FROM users WHERE role = 'partner' AND status = 'active' AND partner_program_id = ?");
+            $stmt->execute([$program['id']]);
+            foreach ($stmt->fetchAll() as $partner) {
+                notify((int) $partner['id'], 'Request ' . $request['reference_no'] . ' was matched to your program.',
+                       'partner/request_view.php?id=' . $request['id']);
+            }
+        }
+        return $error;
+    }
+
+    if ($action === 'ready') {
+        $stmt = db()->prepare(
+            "SELECT p.id, p.name, p.branch FROM pharmacies p
+             JOIN users u ON u.id = p.user_id AND u.status = 'active'
+             WHERE p.id = ?"
+        );
+        $stmt->execute([to_int(post('claim_pharmacy_id')) ?? 0]);
+        $pharmacy = $stmt->fetch();
+        if (!$pharmacy) {
+            return 'Please choose where the patient will claim the medicine.';
+        }
+        $text = $note !== '' ? $note
+              : 'Claim at ' . $pharmacy['name'] . ($pharmacy['branch'] ? ' · ' . $pharmacy['branch'] : '') . '. Bring a valid ID.';
+        return change_request_status($request, 'ready_to_claim', $text, ['claim_pharmacy_id' => (int) $pharmacy['id']]);
+    }
+
+    // 'claimed'
+    return change_request_status($request, 'claimed', $note !== '' ? $note : 'Medicine received by the patient.');
+}
+
+/** Active partner programs (for the "Match" dropdown). */
+function active_programs(): array
+{
+    return db()->query('SELECT id, name FROM partner_programs WHERE is_active = 1 ORDER BY name')->fetchAll();
+}
+
+/** Approved pharmacies, the patient's city first (for "Ready to claim"). */
+function claim_pharmacies(string $patient_city): array
+{
+    $stmt = db()->prepare(
+        "SELECT p.id, p.name, p.branch, p.city
+         FROM pharmacies p JOIN users u ON u.id = p.user_id AND u.status = 'active'
+         ORDER BY (p.city = ?) DESC, p.city, p.name"
+    );
+    $stmt->execute([$patient_city]);
+    return $stmt->fetchAll();
+}
+
 /** Short urgency label from how much medicine is left, e.g. "None left". */
 function urgency_badge(string $supply_left): string
 {
