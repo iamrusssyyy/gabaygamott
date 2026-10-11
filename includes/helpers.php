@@ -44,6 +44,28 @@ function post(string $key): string
 }
 
 /**
+ * Inline form errors (shown right under the field, as in the wireframes).
+ * $errors is an array like ['email' => 'Please enter a valid email.'].
+ *
+ *   <input class="form-control<?= error_class($errors, 'email') ?>" ...>
+ *   <?= error_text($errors, 'email') ?>
+ *
+ * error_class() adds Bootstrap's red border; error_text() prints the message.
+ */
+function error_class(array $errors, string $field): string
+{
+    return isset($errors[$field]) ? ' is-invalid' : '';
+}
+
+function error_text(array $errors, string $field): string
+{
+    if (!isset($errors[$field])) {
+        return '';
+    }
+    return '<div class="invalid-feedback">' . e($errors[$field]) . '</div>';
+}
+
+/**
  * Flash message = a one-time message shown on the NEXT page,
  * e.g. "Welcome back!" after logging in. It is stored in the session
  * and deleted as soon as it is shown (see includes/header.php).

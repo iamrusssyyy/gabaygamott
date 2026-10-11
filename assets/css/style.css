@@ -39,6 +39,28 @@ a {
     margin: 2rem auto;
 }
 
+/* Wider card for the registration form */
+.register-card {
+    max-width: 760px;
+    margin: 1rem auto;
+}
+
+/* Role choice boxes on the registration page */
+.role-option {
+    cursor: pointer;
+    height: 100%;
+}
+.role-option:has(input:checked) {
+    border-color: var(--gg-green) !important;
+    background-color: #e8f1ee;
+}
+
+/* Map where a pharmacy clicks to pin its location */
+#pharmacy-map {
+    height: 300px;
+    border-radius: 0.5rem;
+}
+
 /* Bigger tap targets on forms, for older users and phones */
 .form-control,
 .form-select,

@@ -1,10 +1,15 @@
 <?php
 // =====================================================================
 // includes/header.php — top part of every page (HTML head + navigation).
-// Before including it, a page may set $page_title.
+// Before including it, a page may set:
+//   $page_title    text for the browser tab
+//   $use_map       true to load the Leaflet map library
+//   $page_scripts  list of our own JS files, e.g. ['assets/js/register.js']
+//                  (loaded by includes/footer.php)
 // =====================================================================
 
 $page_title = $page_title ?? APP_NAME;
+$use_map    = $use_map ?? false;
 $nav_user   = current_user();
 $flash      = get_flash();
 ?>
@@ -26,6 +31,14 @@ $flash      = get_flash();
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
           crossorigin="anonymous">
+
+    <?php if ($use_map): ?>
+    <!-- Leaflet map library CSS (only on pages that show a map) -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin="anonymous">
+    <?php endif; ?>
 
     <!-- Our own styles (loaded last so they can override Bootstrap) -->
     <link rel="stylesheet" href="<?= e(url('assets/css/style.css')) ?>">
@@ -64,6 +77,9 @@ $flash      = get_flash();
                         </form>
                     </li>
                 <?php else: ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= e(url('register.php')) ?>">Create account</a>
+                    </li>
                     <li class="nav-item">
                         <a class="btn btn-primary btn-sm" href="<?= e(url('login.php')) ?>">Log in</a>
                     </li>

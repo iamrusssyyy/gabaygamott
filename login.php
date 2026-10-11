@@ -95,6 +95,10 @@ require __DIR__ . '/includes/header.php';
 
             <button type="submit" class="btn btn-primary w-100">Log in</button>
         </form>
+
+        <p class="text-center mt-4 mb-0">
+            No account yet? <a href="<?= e(url('register.php')) ?>">Create an account</a>
+        </p>
     </div>
 </div>
 
