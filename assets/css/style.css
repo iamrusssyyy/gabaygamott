@@ -963,3 +963,27 @@ h1.h3 {
     font-size: 1.85rem;
     font-weight: 700;
 }
+
+/* ---------- Page fade-in ----------
+   Every menu link and tab loads a new page. The page content (<main>)
+   fades in quickly while the header / admin sidebar stay still, so
+   switching tabs feels smooth. 0.25s = quick, not distracting. */
+@keyframes page-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);   /* starts slightly lower, floats up */
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+main {
+    animation: page-fade-in 0.25s ease-out;
+}
+/* Respect people who turned on "reduce motion" on their device */
+@media (prefers-reduced-motion: reduce) {
+    main {
+        animation: none;
+    }
+}
