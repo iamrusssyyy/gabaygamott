@@ -111,6 +111,17 @@ function time_ago(string $datetime): string
 }
 
 /**
+ * Initials for the round avatar in the header: "Maria Santos" -> "MS".
+ */
+function initials(string $name): string
+{
+    $words = preg_split('/\s+/', trim($name));
+    $first = mb_substr($words[0] ?? '', 0, 1);
+    $last  = count($words) > 1 ? mb_substr(end($words), 0, 1) : '';
+    return mb_strtoupper($first . $last);
+}
+
+/**
  * Full medicine name from a row that has generic_name, brand_name,
  * strength, and dosage_form:
  *   "Losartan Potassium 50 mg tablet"            (generic)

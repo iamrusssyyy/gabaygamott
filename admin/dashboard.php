@@ -233,7 +233,7 @@ require __DIR__ . '/../includes/header.php';
                 <?php if (!$low_stock): ?><p class="small text-muted mb-0">None. 👍</p><?php endif; ?>
                 <?php foreach ($low_stock as $item): ?>
                     <div class="small mb-1">
-                        <?= stock_dot((int) $item['quantity'], (int) $item['low_stock_threshold']) ?> ·
+                        <?= stock_pill((int) $item['quantity'], (int) $item['low_stock_threshold']) ?> ·
                         <?= e(medicine_name($item)) ?> at <?= e($item['pharmacy_name']) ?><?= $item['branch'] ? ' · ' . e($item['branch']) : '' ?>
                     </div>
                 <?php endforeach; ?>

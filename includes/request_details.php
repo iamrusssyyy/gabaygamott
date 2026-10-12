@@ -16,7 +16,7 @@
         <!-- Medicine -->
         <div class="card mb-3">
             <div class="card-body">
-                <h2 class="h6 text-muted">Medicine needed</h2>
+                <h2 class="h5">Medicine needed</h2>
                 <div class="fs-5 fw-semibold"><?= e(medicine_name($request)) ?></div>
                 <dl class="row small mb-0 mt-2">
                     <dt class="col-5">Quantity per month</dt>
@@ -42,7 +42,7 @@
         <!-- Patient -->
         <div class="card mb-3">
             <div class="card-body">
-                <h2 class="h6 text-muted">Patient</h2>
+                <h2 class="h5">Patient</h2>
                 <dl class="row small mb-0">
                     <dt class="col-5">Name</dt>
                     <dd class="col-7"><?= e($request['patient_name']) ?></dd>
@@ -70,44 +70,32 @@
         <!-- Documents (opened through files/view.php, which checks permission) -->
         <div class="card mb-3">
             <div class="card-body">
-                <h2 class="h6 text-muted">Documents</h2>
+                <h2 class="h5">Documents</h2>
                 <?php if (!$documents): ?>
                     <p class="small text-muted mb-0">No documents uploaded.</p>
                 <?php endif; ?>
-                <ul class="list-unstyled mb-0">
+                <div class="d-flex flex-wrap gap-2">
                     <?php foreach ($documents as $document): ?>
-                        <li class="mb-1">
-                            <strong><?= e(DOC_TYPES[$document['doc_type']]['label'] ?? $document['doc_type']) ?>:</strong>
-                            <a href="<?= e(url('files/view.php?type=request_doc&id=' . $document['id'])) ?>" target="_blank" rel="noopener">
-                                <?= e($document['original_name']) ?></a>
-                            <span class="small text-muted">(<?= e(number_format($document['file_size'] / 1024, 0)) ?> KB,
-                                uploaded <?= e(time_ago($document['uploaded_at'])) ?>)</span>
-                        </li>
+                        <a class="btn btn-outline-primary" target="_blank" rel="noopener"
+                           href="<?= e(url('files/view.php?type=request_doc&id=' . $document['id'])) ?>"
+                           title="<?= e($document['original_name']) ?> · <?= e(number_format($document['file_size'] / 1024, 0)) ?> KB · uploaded <?= e(time_ago($document['uploaded_at'])) ?>">
+                            View <?= e(strtolower(DOC_TYPES[$document['doc_type']]['label'] ?? 'document')) ?>
+                        </a>
                     <?php endforeach; ?>
-                </ul>
+                </div>
+                <?php if ($documents): ?>
+                    <p class="small text-muted mt-2 mb-0">Private files · opened only after checking who you are.</p>
+                <?php endif; ?>
             </div>
         </div>
     </div>
 
-    <!-- Timeline -->
+    <!-- Status history (shared timeline; also shows who made each change) -->
     <div class="col-12 col-lg-5">
         <div class="card">
             <div class="card-body">
-                <h2 class="h6 text-muted">Timeline</h2>
-                <ol class="timeline list-unstyled mb-0">
-                    <?php foreach ($history as $step): ?>
-                        <li class="mb-3">
-                            <div><?= request_badge($step['status']) ?>
-                                <span class="small text-muted"><?= e(format_datetime($step['changed_at'])) ?></span></div>
-                            <?php if ($step['note']): ?>
-                                <div class="small mt-1"><?= e($step['note']) ?></div>
-                            <?php endif; ?>
-                            <?php if ($step['changed_by_role'] && $step['changed_by_role'] !== 'beneficiary'): ?>
-                                <div class="small text-muted">by <?= e($step['changed_by_role'] === 'admin' ? 'GabayGamot admin' : 'partner program') ?></div>
-                            <?php endif; ?>
-                        </li>
-                    <?php endforeach; ?>
-                </ol>
+                <h2 class="h5 mb-3">Status history</h2>
+                <?php $show_changed_by = true; require __DIR__ . '/status_history.php'; ?>
             </div>
         </div>
     </div>

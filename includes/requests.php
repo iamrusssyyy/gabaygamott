@@ -43,6 +43,24 @@ function load_request(int $id): ?array
     return $stmt->fetch() ?: null;
 }
 
+/** All requests of one beneficiary, newest first (for "My requests"). */
+function load_my_requests(int $beneficiary_id): array
+{
+    $stmt = db()->prepare(
+        'SELECT r.id, r.reference_no, r.patient_name, r.status, r.status_note, r.quantity_per_month,
+                r.submitted_at, r.updated_at,
+                m.generic_name, m.brand_name, m.strength, m.dosage_form,
+                pp.name AS program_name
+         FROM assistance_requests r
+         JOIN medicines m ON m.id = r.medicine_id
+         LEFT JOIN partner_programs pp ON pp.id = r.partner_program_id
+         WHERE r.beneficiary_id = ?
+         ORDER BY r.submitted_at DESC, r.id DESC'
+    );
+    $stmt->execute([$beneficiary_id]);
+    return $stmt->fetchAll();
+}
+
 /** The uploaded documents of a request. */
 function load_request_documents(int $request_id): array
 {
@@ -243,8 +261,8 @@ function claim_pharmacies(string $patient_city): array
 function urgency_badge(string $supply_left): string
 {
     $info  = SUPPLY_LEFT[$supply_left] ?? ['label' => $supply_left, 'rank' => 4];
-    $color = $info['rank'] <= 2 ? 'danger' : ($info['rank'] === 3 ? 'warning' : 'secondary');
-    return '<span class="badge text-bg-' . $color . '">' . e($info['label']) . '</span>';
+    $color = $info['rank'] <= 2 ? 'red' : ($info['rank'] === 3 ? 'amber' : 'gray');
+    return pill($info['label'], $color);
 }
 
 /** Age in years from a birthdate. */

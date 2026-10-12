@@ -4,63 +4,63 @@
 // the database. Example: the database stores 'ready_to_claim', but the
 // user sees a green "Ready to claim" badge.
 //
-// 'color' is a Bootstrap color name used for badges:
-//   secondary = gray, info = light blue, primary = green (our theme),
-//   success = green, warning = yellow, danger = red, dark = black
+// 'color' is the pill color (see .pill-* in assets/css/style.css):
+//   blue = in progress, green = good, amber = needs attention,
+//   red = stopped or rejected, gray = finished
 // =====================================================================
 
 // Statuses of an assistance request, in the order they normally happen.
 const REQUEST_STATUSES = [
     'submitted' => [
         'label' => 'Submitted',
-        'color' => 'secondary',
+        'color' => 'blue',
         'help'  => 'We received your request. An admin will check your documents (usually 1–2 working days).',
     ],
     'verified' => [
         'label' => 'Verified',
-        'color' => 'info',
+        'color' => 'blue',
         'help'  => 'Your documents are complete. We are now matching you with an assistance program or donated medicine.',
     ],
     'matched' => [
         'label' => 'Matched',
-        'color' => 'primary',
+        'color' => 'blue',
         'help'  => 'Your request was matched with an assistance program and/or donated medicine. We will tell you where to claim it.',
     ],
     'ready_to_claim' => [
         'label' => 'Ready to claim',
-        'color' => 'success',
+        'color' => 'green',
         'help'  => 'Your medicine is ready. See where to claim it below. Bring a valid ID.',
     ],
     'claimed' => [
         'label' => 'Claimed',
-        'color' => 'dark',
+        'color' => 'gray',
         'help'  => 'You have received your medicine. Salamat!',
     ],
     'action_needed' => [
         'label' => 'Action needed',
-        'color' => 'warning',
+        'color' => 'amber',
         'help'  => 'We need something from you. Please read the note and update your request.',
     ],
     'rejected' => [
         'label' => 'Not approved',
-        'color' => 'danger',
+        'color' => 'red',
         'help'  => 'Your request could not be approved. Please read the reason below.',
     ],
 ];
 
 // Statuses of a donation.
 const DONATION_STATUSES = [
-    'pending'  => ['label' => 'Waiting for review', 'color' => 'warning'],
-    'approved' => ['label' => 'Approved',           'color' => 'success'],
-    'rejected' => ['label' => 'Not accepted',       'color' => 'danger'],
+    'pending'  => ['label' => 'Waiting for review', 'color' => 'amber'],
+    'approved' => ['label' => 'Approved',           'color' => 'green'],
+    'rejected' => ['label' => 'Not accepted',       'color' => 'red'],
 ];
 
 // Statuses of a user account.
 const ACCOUNT_STATUSES = [
-    'pending'  => ['label' => 'Waiting for approval', 'color' => 'warning'],
-    'active'   => ['label' => 'Active',               'color' => 'success'],
-    'rejected' => ['label' => 'Rejected',             'color' => 'danger'],
-    'disabled' => ['label' => 'Disabled',             'color' => 'secondary'],
+    'pending'  => ['label' => 'Waiting for approval', 'color' => 'amber'],
+    'active'   => ['label' => 'Active',               'color' => 'green'],
+    'rejected' => ['label' => 'Rejected',             'color' => 'red'],
+    'disabled' => ['label' => 'Disabled',             'color' => 'gray'],
 ];
 
 // Wizard step 1: who the patient is to the person filling in the form.
@@ -104,47 +104,56 @@ const DOSAGE_FORMS = ['tablet', 'capsule', 'syrup', 'suspension', 'inhaler', 'in
 // "Unit" = what one price and one quantity refer to, e.g. ₱6.50 per tablet
 const UNITS = ['tablet', 'capsule', 'bottle', 'inhaler', 'vial', 'ampule', 'tube', 'sachet', 'piece'];
 
-/** Colored badge for a request status, e.g. <span class="badge ...">Matched</span> */
+/**
+ * A colored "pill" label. pill('Matched', 'blue') prints a small rounded
+ * blue label. Colors: green, amber, red, blue, gray (see .pill-* in style.css).
+ */
+function pill(string $text, string $color): string
+{
+    return '<span class="pill pill-' . e($color) . '">' . e($text) . '</span>';
+}
+
+/** Pill for a request status, e.g. a blue "Submitted". */
 function request_badge(string $status): string
 {
-    $info = REQUEST_STATUSES[$status] ?? ['label' => $status, 'color' => 'secondary'];
-    return '<span class="badge text-bg-' . e($info['color']) . '">' . e($info['label']) . '</span>';
+    $info = REQUEST_STATUSES[$status] ?? ['label' => $status, 'color' => 'gray'];
+    return pill($info['label'], $info['color']);
 }
 
-/** Colored badge for a donation status. */
+/** Pill for a donation status. */
 function donation_badge(string $status): string
 {
-    $info = DONATION_STATUSES[$status] ?? ['label' => $status, 'color' => 'secondary'];
-    return '<span class="badge text-bg-' . e($info['color']) . '">' . e($info['label']) . '</span>';
+    $info = DONATION_STATUSES[$status] ?? ['label' => $status, 'color' => 'gray'];
+    return pill($info['label'], $info['color']);
 }
 
-/** Colored badge for an account status. */
+/** Pill for an account status. */
 function account_badge(string $status): string
 {
-    $info = ACCOUNT_STATUSES[$status] ?? ['label' => $status, 'color' => 'secondary'];
-    return '<span class="badge text-bg-' . e($info['color']) . '">' . e($info['label']) . '</span>';
+    $info = ACCOUNT_STATUSES[$status] ?? ['label' => $status, 'color' => 'gray'];
+    return pill($info['label'], $info['color']);
 }
 
 /**
  * Stock status from quantity, as described in database/schema.sql:
  *   0 = out of stock, at or below the threshold = low stock, else in stock.
- * Returns ['code' => 'low', 'label' => 'Low stock', 'color' => 'warning'].
+ * Returns ['code' => 'low', 'label' => 'Low stock', 'color' => 'amber'].
  */
 function stock_status(int $quantity, int $threshold): array
 {
     if ($quantity === 0) {
-        return ['code' => 'out', 'label' => 'Out of stock', 'color' => 'danger'];
+        return ['code' => 'out', 'label' => 'Out of stock', 'color' => 'red'];
     }
     if ($quantity <= $threshold) {
-        return ['code' => 'low', 'label' => 'Low stock', 'color' => 'warning'];
+        return ['code' => 'low', 'label' => 'Low stock', 'color' => 'amber'];
     }
-    return ['code' => 'in', 'label' => 'In stock', 'color' => 'success'];
+    return ['code' => 'in', 'label' => 'In stock', 'color' => 'green'];
 }
 
-/** The ● dot + label used in the wireframes, e.g. "● Low stock · 18". */
-function stock_dot(int $quantity, int $threshold, bool $show_quantity = true): string
+/** Stock pill as in the prototype, e.g. a green "In stock · 240". */
+function stock_pill(int $quantity, int $threshold, bool $show_quantity = true): string
 {
     $status = stock_status($quantity, $threshold);
     $text = $status['label'] . ($show_quantity && $quantity > 0 ? ' · ' . $quantity : '');
-    return '<span class="stock-dot text-' . e($status['color']) . '">●</span> ' . e($text);
+    return pill($text, $status['color']);
 }

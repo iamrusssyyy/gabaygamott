@@ -86,99 +86,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $request['status'] === 'action_need
 }
 
 // ---------------------------------------------------------------------
-// 3. Load the details
+// 3. Load the details (and the list of all my requests for the left side)
 // ---------------------------------------------------------------------
-$documents = load_request_documents((int) $request['id']);
-$history   = load_request_history((int) $request['id']);
-$status    = REQUEST_STATUSES[$request['status']];
+$documents   = load_request_documents((int) $request['id']);
+$history     = load_request_history((int) $request['id']);
+$my_requests = load_my_requests((int) $user['id']);
+$selected_id = (int) $request['id'];
 
 // ---------------------------------------------------------------------
-// 4. Show the page
+// 4. Show the page (prototype "My requests track")
 // ---------------------------------------------------------------------
 $page_title = 'Request ' . $request['reference_no'];
 require __DIR__ . '/../includes/header.php';
 ?>
 
-<a href="<?= e(url('beneficiary/dashboard.php')) ?>" class="small">← My requests</a>
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2 mb-3">
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 page-head">
     <div>
-        <h1 class="h3 mb-0"><?= e($request['reference_no']) ?></h1>
-        <div class="text-muted">Submitted <?= e(format_datetime($request['submitted_at'])) ?></div>
+        <a href="<?= e(url('beneficiary/dashboard.php')) ?>" class="small d-lg-none">← My requests</a>
+        <h1>My requests</h1>
+        <div class="subtitle">Subaybayan ang request</div>
     </div>
-    <div class="fs-5"><?= request_badge($request['status']) ?></div>
+    <a href="<?= e(url('beneficiary/request_new.php')) ?>" class="btn btn-primary btn-lg d-none d-md-inline-flex">+ New medicine request</a>
 </div>
 
-<!-- What this status means and what to do -->
-<div class="alert alert-<?= e($status['color'] === 'secondary' || $status['color'] === 'dark' ? 'light border' : $status['color']) ?>">
-    <div><?= e($status['help']) ?></div>
-    <?php if ($request['status_note']): ?>
-        <div class="mt-2"><strong>Note:</strong> <?= e($request['status_note']) ?></div>
-    <?php endif; ?>
+<div class="row g-4">
+    <!-- Desktop: all my requests, this one highlighted -->
+    <div class="col-12 col-lg-4 d-none d-lg-block">
+        <?php require __DIR__ . '/../includes/my_requests_list.php'; ?>
+    </div>
+    <div class="col-12 col-lg-8">
+        <?php require __DIR__ . '/../includes/my_request_detail.php'; ?>
+    </div>
 </div>
-
-<?php if ($request['claim_pharmacy_name'] && in_array($request['status'], ['ready_to_claim', 'claimed'], true)): ?>
-    <!-- Where to claim -->
-    <div class="card border-success mb-3">
-        <div class="card-body">
-            <h2 class="h6 text-success">Where to claim your medicine</h2>
-            <div class="fw-semibold"><?= e($request['claim_pharmacy_name']) ?><?= $request['claim_branch'] ? ' · ' . e($request['claim_branch']) : '' ?></div>
-            <div class="small"><?= e($request['claim_address']) ?>, <?= e($request['claim_city']) ?></div>
-            <div class="small text-muted"><?= e($request['claim_hours'] ?? '') ?></div>
-            <div class="d-flex gap-2 mt-2">
-                <?php if ($request['claim_phone']): ?>
-                    <a class="btn btn-sm btn-outline-secondary" href="tel:<?= e(preg_replace('/[^0-9+]/', '', $request['claim_phone'])) ?>">Call <?= e($request['claim_phone']) ?></a>
-                <?php endif; ?>
-                <a class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener"
-                   href="<?= e(directions_url($request['claim_lat'], $request['claim_lng'])) ?>">Directions</a>
-            </div>
-            <p class="small mt-2 mb-0">Bring a valid ID and your reference number <strong><?= e($request['reference_no']) ?></strong>.</p>
-        </div>
-    </div>
-<?php endif; ?>
-
-<?php if ($request['status'] === 'action_needed'): ?>
-    <!-- Fix and send back -->
-    <div class="card border-warning mb-4">
-        <div class="card-body">
-            <h2 class="h5">Update your request</h2>
-            <form method="post" action="<?= e(url('beneficiary/request_view.php?id=' . $request['id'])) ?>"
-                  enctype="multipart/form-data" novalidate>
-                <?= csrf_field() ?>
-                <p class="small text-muted">Upload only the documents you need to replace (JPG, PNG, or PDF, up to 5 MB).</p>
-                <div class="row g-3">
-                    <?php foreach (DOC_TYPES as $type => $info): ?>
-                        <div class="col-12 col-md-4">
-                            <label for="<?= e($type) ?>" class="form-label small fw-semibold"><?= e($info['label']) ?></label>
-                            <input type="file" id="<?= e($type) ?>" name="<?= e($type) ?>"
-                                   accept="image/jpeg,image/png,application/pdf"
-                                   class="form-control<?= error_class($errors, $type) ?>">
-                            <?= error_text($errors, $type) ?>
-                        </div>
-                    <?php endforeach; ?>
-                    <div class="col-12">
-                        <label for="message" class="form-label small fw-semibold">Message for the admin <span class="text-muted fw-normal">(optional)</span></label>
-                        <input type="text" id="message" name="message" maxlength="200"
-                               class="form-control<?= error_class($errors, 'message') ?>" value="<?= e(post('message')) ?>">
-                        <?= error_text($errors, 'message') ?>
-                    </div>
-                    <div class="col-12">
-                        <div class="form-check">
-                            <input class="form-check-input<?= error_class($errors, 'documents_consent') ?>" type="checkbox"
-                                   id="documents_consent" name="documents_consent" value="1">
-                            <label class="form-check-label small" for="documents_consent">
-                                I agree that GabayGamot may store these documents and share them only with its administrators
-                                and the matched partner program, under RA 10173.
-                            </label>
-                            <?= error_text($errors, 'documents_consent') ?>
-                        </div>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary mt-3">Send back for review</button>
-            </form>
-        </div>
-    </div>
-<?php endif; ?>
-
-<?php require __DIR__ . '/../includes/request_details.php'; ?>
 
 <?php require __DIR__ . '/../includes/footer.php'; ?>

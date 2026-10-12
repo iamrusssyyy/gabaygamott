@@ -1,17 +1,28 @@
 <?php
 // =====================================================================
-// includes/footer.php — bottom part of every page.
+// includes/footer.php — bottom part of every page. Closes what
+// includes/header.php opened (container, main, admin layout).
 // =====================================================================
 ?>
+<?php if (!($full_width ?? false) || ($is_admin_layout ?? false)): ?>
+</div>
+<?php endif; ?>
 </main>
 
-<footer class="border-top py-3 mt-5">
-    <div class="container small text-muted">
-        <?= e(APP_NAME) ?> · Medicine Locator and Donation Management System · Metro Manila
+<?php if ($is_admin_layout ?? false): ?>
+</div><!-- /.admin-shell -->
+<?php else: ?>
+<footer class="site-footer">
+    <div class="container d-flex flex-wrap gap-3 gap-lg-5">
+        <strong><?= e(APP_NAME) ?></strong>
+        <span>Pilot area: Metro Manila</span>
+        <span>Protected under the Data Privacy Act of 2012 (RA 10173). <a href="<?= e(url('privacy.php')) ?>">Privacy notice</a></span>
+        <span>Capstone project · pharmacies and prices are sample data</span>
     </div>
 </footer>
+<?php endif; ?>
 
-<!-- Bootstrap JavaScript (needed for the mobile menu button) -->
+<!-- Bootstrap JavaScript (mobile menu button and the avatar dropdown) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>

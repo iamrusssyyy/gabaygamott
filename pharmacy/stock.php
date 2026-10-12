@@ -222,7 +222,7 @@ require __DIR__ . '/../includes/header.php';
             <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
                 <strong><?= e(medicine_name($item)) ?></strong>
                 <span class="small">
-                    <?= stock_dot((int) $item['quantity'], (int) $item['low_stock_threshold']) ?>
+                    <?= stock_pill((int) $item['quantity'], (int) $item['low_stock_threshold']) ?>
                     · <span class="text-muted">Updated <?= e(time_ago($item['last_updated_at'])) ?></span>
                 </span>
             </div>

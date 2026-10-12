@@ -11,7 +11,7 @@
 const ROLE_HOME = [
     'beneficiary' => 'beneficiary/dashboard.php',
     'donor'       => 'donor/dashboard.php',
-    'pharmacy'    => 'pharmacy/dashboard.php',
+    'pharmacy'    => 'pharmacy/stock.php',
     'partner'     => 'partner/dashboard.php',
     'admin'       => 'admin/dashboard.php',
 ];
@@ -30,7 +30,7 @@ function current_user(): ?array
 
         if (isset($_SESSION['user_id'])) {
             $stmt = db()->prepare(
-                'SELECT id, role, full_name, email, phone, city, partner_program_id, status
+                'SELECT id, role, full_name, email, phone, city, organization_name, partner_program_id, status
                  FROM users WHERE id = ?'
             );
             $stmt->execute([$_SESSION['user_id']]);

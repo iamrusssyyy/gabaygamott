@@ -1,180 +1,923 @@
 /* =====================================================================
-   GabayGamot styles — small additions on top of Bootstrap 5.
-   Colors are defined once here as CSS variables ("--name: value") so
-   we can change the whole theme in one place.
+   GabayGamot styles — our design on top of Bootstrap 5.
+   Matches the high-fidelity prototype: deep green buttons, mint
+   highlights, an amber accent, white rounded cards on a light page.
+
+   All colors are defined ONCE below as CSS variables ("--name: value"),
+   so the whole theme can be changed in one place.
    ===================================================================== */
 
 :root {
-    --gg-green: #1f6b55;        /* main brand color (buttons, links) */
-    --gg-green-dark: #174f3f;   /* hover / pressed */
-    --gg-cream: #f6f3ec;        /* soft page background */
+    /* Brand */
+    --gg-green: #137a64;          /* buttons, links, active items */
+    --gg-green-hover: #0f6652;    /* button hover */
+    --gg-green-dark: #0d5c4e;     /* headings, admin sidebar, banners */
+    --gg-mint: #e3f2ec;           /* soft green background (active menu, hero) */
+    --gg-mint-border: #a9d6c5;
+    --gg-amber: #f2b33d;          /* accent (logo, "cheapest" label) */
+
+    /* Soft status colors (background + text) */
+    --gg-green-soft: #dff1e8;   --gg-green-text: #146b4c;
+    --gg-amber-soft: #fdefd4;   --gg-amber-text: #8a4b00;
+    --gg-red-soft: #fde6e4;     --gg-red-text: #b42318;
+    --gg-blue-soft: #e5edfc;    --gg-blue-text: #1d4ed8;
+    --gg-gray-soft: #eef1f0;    --gg-gray-text: #4b5551;
+
+    /* Neutrals */
+    --gg-page: #f3f5f4;           /* page background */
+    --gg-border: #d8dfdc;         /* card borders */
+    --gg-input-border: #8f9a96;   /* form field borders */
+    --gg-ink: #17201d;            /* main text */
+    --gg-muted: #5c6763;          /* secondary text */
+    --gg-footer: #13201c;
+
+    /* Tell Bootstrap to use our colors and rounder corners */
+    --bs-body-font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    --bs-body-color: var(--gg-ink);
+    --bs-secondary-color: var(--gg-muted);
+    --bs-border-color: var(--gg-border);
+    --bs-border-radius: 0.5rem;
+    --bs-link-color: var(--gg-green);
+    --bs-link-color-rgb: 19, 122, 100;
+    --bs-link-hover-color: var(--gg-green-hover);
+    --bs-link-hover-color-rgb: 15, 102, 82;
+    --bs-primary-rgb: 19, 122, 100;
 }
 
 body {
-    font-family: 'IBM Plex Sans', system-ui, sans-serif;
-    background-color: var(--gg-cream);
-    color: #1d2a26;
+    background-color: var(--gg-page);
+    color: var(--gg-ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+main {
+    flex: 1 0 auto;   /* pushes the footer to the bottom of short pages */
+}
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: var(--gg-ink);
+}
+.text-muted {
+    color: var(--gg-muted) !important;
+}
+/* Reference numbers like GG-2026-000123 */
+.mono {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.02em;
 }
 
-a {
-    color: var(--gg-green);
+/* ---------- Page title block ---------- */
+.page-head {
+    margin-bottom: 1.5rem;
+}
+.page-head h1 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    margin-bottom: 0.15rem;
+}
+.page-head .subtitle {
+    color: var(--gg-muted);
+}
+.req {               /* red * after required labels */
+    color: #c0392b;
 }
 
-/* Bootstrap 5.3 buttons read their colors from these --bs-btn-* variables,
-   so we only need to swap the values to use our green. */
+/* ---------- Header (public and most roles) ---------- */
+.site-header {
+    background: #fff;
+    border-bottom: 1px solid var(--gg-border);
+}
+.site-header .navbar {
+    min-height: 64px;
+}
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--gg-ink);
+    text-decoration: none;
+}
+.brand:hover {
+    color: var(--gg-ink);
+}
+/* The capsule logo: half green, half amber */
+.logo-pill {
+    display: inline-block;
+    width: 26px;
+    height: 13px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--gg-green) 50%, var(--gg-amber) 50%);
+}
+.role-tag {
+    display: inline-block;
+    border: 1px solid var(--gg-border);
+    background: var(--gg-gray-soft);
+    color: var(--gg-gray-text);
+    border-radius: 999px;
+    padding: 0.1rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+/* Menu links: the current page gets a mint "pill" background */
+.site-header .nav-link {
+    color: var(--gg-ink);
+    font-weight: 500;
+    padding: 0.5rem 0.9rem !important;
+    border-radius: 0.6rem;
+}
+.site-header .nav-link:hover {
+    background: var(--gg-gray-soft);
+}
+.site-header .nav-link.active {
+    background: var(--gg-mint);
+    color: var(--gg-green-dark);
+    font-weight: 600;
+}
+/* Round avatar with the user's initials */
+.avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--gg-mint);
+    color: var(--gg-green-dark);
+    font-weight: 700;
+    font-size: 0.9rem;
+    position: relative;
+}
+.avatar .dot {          /* unread notifications */
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: #d92d20;
+    color: #fff;
+    font-size: 0.7rem;
+    line-height: 18px;
+    text-align: center;
+    border: 2px solid #fff;
+}
+.user-label {
+    color: var(--gg-muted);
+    font-size: 0.95rem;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+    background: var(--gg-footer);
+    color: #c9d2ce;
+    padding: 1.25rem 0;
+    font-size: 0.9rem;
+    margin-top: 3rem;
+}
+.site-footer strong {
+    color: #fff;
+}
+.site-footer a {
+    color: #fff;
+}
+
+/* ---------- Admin layout: dark green sidebar ---------- */
+.admin-shell {
+    display: flex;
+    min-height: 100vh;
+}
+.admin-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--gg-green-dark);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem 0.75rem;
+}
+.admin-sidebar .brand {
+    color: #fff;
+    font-size: 1.15rem;
+    line-height: 1.2;
+    padding: 0 0.5rem 1.25rem;
+    align-items: flex-start;
+}
+.admin-sidebar .brand .logo-pill {
+    background: linear-gradient(90deg, #fff 50%, var(--gg-amber) 50%);
+    margin-top: 0.35rem;
+}
+.admin-nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: #fff;
+    text-decoration: none;
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.6rem;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+.admin-nav a:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+.admin-nav a.active {
+    background: rgba(255, 255, 255, 0.16);
+    font-weight: 600;
+}
+.admin-nav .count {
+    margin-left: auto;
+    background: var(--gg-amber);
+    color: #3b2500;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.1rem 0.5rem;
+}
+.admin-user {
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 1rem 0.5rem 0;
+    font-size: 0.95rem;
+}
+.admin-main {
+    flex: 1;
+    min-width: 0;   /* lets wide tables scroll instead of stretching the page */
+    padding: 2rem;
+}
+/* On phones and tablets the sidebar becomes a bar on top */
+@media (max-width: 991.98px) {
+    .admin-shell {
+        flex-direction: column;
+    }
+    .admin-sidebar {
+        width: 100%;
+        padding: 0.75rem;
+    }
+    .admin-sidebar .brand {
+        padding-bottom: 0.5rem;
+    }
+    .admin-nav {
+        display: flex;
+        overflow-x: auto;
+        gap: 0.25rem;
+    }
+    .admin-nav a {
+        white-space: nowrap;
+        margin-bottom: 0;
+    }
+    .admin-user {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding-top: 0.75rem;
+        margin-top: 0.5rem;
+    }
+    .admin-main {
+        padding: 1.25rem 1rem;
+    }
+}
+
+/* ---------- Cards ---------- */
+.card {
+    border-color: var(--gg-border);
+    border-radius: 0.85rem;
+    box-shadow: 0 1px 2px rgba(16, 32, 26, 0.04);
+}
+.card-soft {              /* mint card, e.g. "What we accept" */
+    background: var(--gg-mint);
+    border: 1px solid var(--gg-mint-border);
+    border-radius: 0.85rem;
+}
+.card-soft h2, .card-soft h3 {
+    color: var(--gg-green-dark);
+}
+.section-title {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+    border-radius: 0.6rem;
+    font-weight: 600;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+.btn-sm {
+    min-height: 0;
+}
+.btn-lg {
+    border-radius: 0.7rem;
+}
+/* Bootstrap 5.3 buttons read their colors from these --bs-btn-* variables */
 .btn-primary {
     --bs-btn-bg: var(--gg-green);
     --bs-btn-border-color: var(--gg-green);
-    --bs-btn-hover-bg: var(--gg-green-dark);
-    --bs-btn-hover-border-color: var(--gg-green-dark);
+    --bs-btn-hover-bg: var(--gg-green-hover);
+    --bs-btn-hover-border-color: var(--gg-green-hover);
     --bs-btn-active-bg: var(--gg-green-dark);
     --bs-btn-active-border-color: var(--gg-green-dark);
     --bs-btn-disabled-bg: var(--gg-green);
     --bs-btn-disabled-border-color: var(--gg-green);
 }
-
-/* Centered card used by the login page */
-.auth-card {
-    max-width: 420px;
-    margin: 2rem auto;
-}
-
-/* Wider card for the registration form */
-.register-card {
-    max-width: 760px;
-    margin: 1rem auto;
-}
-
-/* Role choice boxes on the registration page */
-.role-option {
-    cursor: pointer;
-    height: 100%;
-}
-.role-option:has(input:checked) {
-    border-color: var(--gg-green) !important;
-    background-color: #e8f1ee;
-}
-
-/* Map where a pharmacy clicks to pin its location */
-#pharmacy-map {
-    height: 300px;
-    border-radius: 0.5rem;
-}
-
-/* ---------- Medicine Locator ---------- */
-.search-box {
-    min-width: 220px;
-}
-#results-map {
-    height: 520px;
-    border-radius: 0.5rem;
-}
-.best-pick {
-    border-color: var(--gg-green);
-    background-color: #f1f7f4;
-}
-/* Price label used as a map pin */
-.price-pin {
-    display: inline-block;
-    background: var(--gg-green);
-    color: #fff;
-    font-weight: 600;
-    font-size: 0.85rem;
-    padding: 2px 8px;
-    border-radius: 999px;
-    border: 2px solid #fff;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
-    white-space: nowrap;
-}
-.price-pin-out {
-    background: #6c757d;
-}
-
-/* Outline buttons in our green (used by the "How much is left?" choices) */
 .btn-outline-primary {
     --bs-btn-color: var(--gg-green);
     --bs-btn-border-color: var(--gg-green);
-    --bs-btn-hover-bg: var(--gg-green);
+    --bs-btn-bg: #fff;
+    --bs-btn-hover-color: var(--gg-green-dark);
+    --bs-btn-hover-bg: var(--gg-mint);
     --bs-btn-hover-border-color: var(--gg-green);
+    --bs-btn-active-color: #fff;
     --bs-btn-active-bg: var(--gg-green);
     --bs-btn-active-border-color: var(--gg-green);
 }
-
-/* ---------- Request wizard ---------- */
-.progress-rail li {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.5rem 0;
-    color: #6c757d;
+/* Gray "Back" button */
+.btn-soft {
+    --bs-btn-bg: #d4ddd9;
+    --bs-btn-color: var(--gg-ink);
+    --bs-btn-border-color: #d4ddd9;
+    --bs-btn-hover-bg: #c5d0cb;
+    --bs-btn-hover-border-color: #c5d0cb;
+    --bs-btn-active-bg: #b9c5c0;
 }
-.progress-rail .rail-number {
+/* Amber outline ("Action needed") and red outline ("Reject") */
+.btn-outline-amber {
+    --bs-btn-color: var(--gg-amber-text);
+    --bs-btn-border-color: #b7791f;
+    --bs-btn-bg: #fff;
+    --bs-btn-hover-color: var(--gg-amber-text);
+    --bs-btn-hover-bg: var(--gg-amber-soft);
+    --bs-btn-hover-border-color: #b7791f;
+    --bs-btn-active-bg: var(--gg-amber-soft);
+}
+.btn-outline-danger {
+    --bs-btn-bg: #fff;
+    --bs-btn-hover-color: var(--gg-red-text);
+    --bs-btn-hover-bg: var(--gg-red-soft);
+    --bs-btn-active-color: var(--gg-red-text);
+    --bs-btn-active-bg: var(--gg-red-soft);
+}
+/* Rounded "chip" buttons, e.g. popular searches */
+.chip {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--gg-input-border);
+    background: #fff;
+    color: var(--gg-ink);
+    border-radius: 999px;
+    padding: 0.35rem 1rem;
+    text-decoration: none;
+    font-weight: 500;
+}
+.chip:hover {
+    border-color: var(--gg-green);
+    color: var(--gg-green-dark);
+}
+
+/* ---------- Forms ---------- */
+.form-control,
+.form-select {
+    border-color: var(--gg-input-border);
+    border-radius: 0.55rem;
+    min-height: 48px;
+}
+textarea.form-control {
+    min-height: 96px;
+}
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: var(--gg-green);
+    box-shadow: 0 0 0 0.2rem rgba(19, 122, 100, 0.2);
+}
+.form-control.is-invalid,
+.form-select.is-invalid {
+    background-color: #fff8f7;
+}
+.form-label {
+    font-weight: 500;
+}
+.form-check-input:checked {
+    background-color: var(--gg-green);
+    border-color: var(--gg-green);
+}
+.form-check-input {
+    width: 1.25em;
+    height: 1.25em;
+    border-color: var(--gg-input-border);
+}
+/* Search box with a magnifying-glass icon inside */
+.search-field {
+    position: relative;
+    flex: 1;
+}
+.search-field .bi-search {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gg-muted);
+}
+.search-field .form-control {
+    padding-left: 2.75rem;
+    min-height: 54px;
+}
+/* Big clickable choice boxes (radio cards) */
+.choice-card {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    border: 1px solid var(--gg-input-border);
+    background: #fff;
+    border-radius: 0.65rem;
+    padding: 0.9rem 1rem;
+    cursor: pointer;
+    height: 100%;
+}
+.choice-card .form-check-input {
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+}
+.choice-card:has(input:checked) {
+    border-color: var(--gg-green);
+    background: var(--gg-mint);
+}
+/* Segmented control (two or more joined buttons, e.g. Nearest | Lowest price) */
+.segmented {
+    display: inline-flex;
+    border: 1px solid var(--gg-input-border);
+    border-radius: 999px;
+    padding: 3px;
+    background: #fff;
+}
+.segmented .btn-check + label {
+    border: 0;
+    border-radius: 999px;
+    padding: 0.4rem 1rem;
+    font-weight: 600;
+    color: var(--gg-muted);
+    cursor: pointer;
+    text-align: center;
+}
+.segmented .btn-check:checked + label {
+    background: var(--gg-green);
+    color: #fff;
+}
+/* "How much is left?" choices: outline buttons that fill when picked */
+.btn-check:checked + .btn-outline-primary {
+    background: var(--gg-green);
+    color: #fff;
+}
+
+/* ---------- Status pills ---------- */
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+.pill-green { background: var(--gg-green-soft); color: var(--gg-green-text); }
+.pill-amber { background: var(--gg-amber-soft); color: var(--gg-amber-text); }
+.pill-red   { background: var(--gg-red-soft);   color: var(--gg-red-text); }
+.pill-blue  { background: var(--gg-blue-soft);  color: var(--gg-blue-text); }
+.pill-gray  { background: var(--gg-gray-soft);  color: var(--gg-gray-text); border: 1px solid #cfd6d3; }
+.pill-solid-amber { background: var(--gg-amber); color: #3b2500; }
+.pill-solid-green { background: var(--gg-green); color: #fff; }
+
+/* ---------- Notices ---------- */
+.notice {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem;
+}
+.notice-amber {
+    background: var(--gg-amber-soft);
+    color: var(--gg-amber-text);
+}
+.notice-mint {
+    background: var(--gg-mint);
+    color: var(--gg-green-dark);
+}
+.notice .bi {
+    font-size: 1.1rem;
+    line-height: 1.3;
+}
+.alert {
+    border-radius: 0.75rem;
+}
+
+/* ---------- Tabs (underline style) ---------- */
+.nav-tabs {
+    border-bottom: 1px solid var(--gg-border);
+    gap: 0.5rem;
+}
+.nav-tabs .nav-link {
+    border: 0;
+    border-bottom: 3px solid transparent;
+    color: var(--gg-muted);
+    font-weight: 600;
+    background: transparent;
+    padding: 0.6rem 1rem;
+    margin-bottom: -1px;
+}
+.nav-tabs .nav-link:hover {
+    color: var(--gg-ink);
+    border-bottom-color: var(--gg-border);
+}
+.nav-tabs .nav-link.active {
+    color: var(--gg-green-dark);
+    border-bottom-color: var(--gg-green);
+    background: transparent;
+}
+
+/* ---------- Tables inside a white rounded box ---------- */
+.table-card {
+    background: #fff;
+    border: 1px solid var(--gg-border);
+    border-radius: 0.85rem;
+    overflow: hidden;
+}
+.table-card .table {
+    margin-bottom: 0;
+}
+.table > :not(caption) > * > * {
+    padding: 0.85rem 1rem;
+}
+.table thead th {
+    background: #f6f8f7;
+    color: var(--gg-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-bottom-color: var(--gg-border);
+}
+.table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+/* ---------- KPI tiles ---------- */
+.kpi-label {
+    color: var(--gg-muted);
+    font-size: 0.95rem;
+}
+.kpi-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.kpi-note {
+    color: var(--gg-muted);
+    font-size: 0.9rem;
+}
+
+/* ---------- Home page ---------- */
+.hero {
+    background: var(--gg-mint);
+    border-bottom: 1px solid var(--gg-mint-border);
+    padding: 3.5rem 0;
+}
+.hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    color: var(--gg-green-dark);
+    letter-spacing: -0.02em;
+}
+.hero .lead {
+    max-width: 46rem;
+}
+.step-number {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
+    width: 2.25rem;
+    height: 2.25rem;
     border-radius: 50%;
-    border: 2px solid #c9d6d0;
-    background: #fff;
-    font-weight: 600;
-}
-.progress-rail li.done .rail-number {
-    background: #e8f1ee;
-    border-color: var(--gg-green);
-    color: var(--gg-green);
-}
-.progress-rail li.current {
-    color: #1d2a26;
-    font-weight: 600;
-}
-.progress-rail li.current .rail-number {
     background: var(--gg-green);
-    border-color: var(--gg-green);
+    color: #fff;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.icon-tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 0.6rem;
+    background: var(--gg-mint);
+    color: var(--gg-green-dark);
+    font-size: 1.4rem;
+}
+.icon-tile-amber {
+    background: var(--gg-amber-soft);
+    color: var(--gg-amber-text);
+}
+.link-arrow {
+    font-weight: 600;
+    text-decoration: none;
+}
+.cta-banner {
+    background: var(--gg-green-dark);
+    color: #fff;
+    border-radius: 0.85rem;
+    padding: 2rem 2.25rem;
+}
+.cta-banner h2 {
     color: #fff;
 }
-/* On desktop the help panel stays visible while scrolling */
+
+/* ---------- Medicine Locator ---------- */
+.filters-card .form-label,
+.filters-card .label {
+    font-weight: 500;
+}
+.best-pick .pill {
+    font-size: 0.8rem;
+}
+.result-card .price {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+#results-map {
+    height: 640px;
+    border-radius: 0.85rem;
+    border: 1px solid var(--gg-border);
+}
 @media (min-width: 992px) {
-    .help-panel {
+    .map-sticky {
         position: sticky;
         top: 1rem;
     }
 }
-/* Status timeline: a line down the left side */
-.timeline li {
-    border-left: 3px solid #c9d6d0;
-    padding-left: 0.75rem;
+@media (max-width: 991.98px) {
+    #results-map {
+        height: 480px;
+    }
+}
+/* Price label used as a map pin */
+.price-pin {
+    display: inline-block;
+    background: #fff;
+    color: var(--gg-ink);
+    border: 1.5px solid #6b7672;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    white-space: nowrap;
+}
+.price-pin-cheapest {
+    background: var(--gg-amber);
+    border-color: var(--gg-amber);
+    color: #3b2500;
+}
+.price-pin-out {
+    background: var(--gg-red-soft);
+    border-color: #e5a29b;
+    color: var(--gg-red-text);
 }
 
-/* ---------- Home page ---------- */
-.door {
-    border-width: 2px;
+/* Map where a pharmacy clicks to pin its location (registration) */
+#pharmacy-map {
+    height: 300px;
+    border-radius: 0.65rem;
 }
-.program-chip {
-    display: inline-block;
-    border: 1px solid #c9d6d0;
+
+/* ---------- Request wizard ---------- */
+.step-rail {
+    list-style: none;
+    padding: 0.75rem;
+    margin: 0;
+}
+.step-rail li {
+    display: flex;
+    gap: 0.85rem;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 0.6rem;
+}
+.step-rail li.current {
+    background: var(--gg-mint);
+}
+.step-rail a {
+    text-decoration: none;
+    color: inherit;
+}
+.step-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: 2px solid #8f9a96;
+    color: var(--gg-muted);
+    font-weight: 700;
+    flex-shrink: 0;
     background: #fff;
-    border-radius: 999px;
-    padding: 0.35rem 0.85rem;
-    margin: 0 0.35rem 0.5rem 0;
+}
+.step-rail li.current .step-circle {
+    border-color: var(--gg-green);
+    color: var(--gg-green);
+}
+.step-rail li.done .step-circle {
+    background: var(--gg-green);
+    border-color: var(--gg-green);
+    color: #fff;
+}
+.step-title {
+    font-weight: 600;
+}
+.step-sub {
+    color: var(--gg-muted);
     font-size: 0.9rem;
 }
-
-/* ---------- Admin dashboard and reports ---------- */
-.kpi-value {
-    font-size: 2rem;
-    font-weight: 600;
-    line-height: 1.2;
+/* Phone version: 4 progress bars across the top */
+.step-bars {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--gg-muted);
 }
+.step-bars span {
+    display: block;
+    height: 6px;
+    border-radius: 999px;
+    background: #d4ddd9;
+    margin-bottom: 0.35rem;
+}
+.step-bars .on span {
+    background: var(--gg-green);
+}
+.step-bars .on.current {
+    color: var(--gg-ink);
+    font-weight: 600;
+}
+.form-card-footer {
+    border-top: 1px solid var(--gg-border);
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
+}
+/* Upload box for documents and packaging photos */
+.upload-box {
+    border: 1px dashed var(--gg-mint-border);
+    background: #f7fbf9;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+.upload-box.done {
+    border-style: solid;
+    background: var(--gg-mint);
+}
+
+/* ---------- Request tracking ---------- */
+.request-item {
+    display: block;
+    background: #fff;
+    border: 1px solid var(--gg-border);
+    border-radius: 0.85rem;
+    padding: 1rem 1.25rem;
+    color: var(--gg-ink);
+    text-decoration: none;
+    margin-bottom: 0.85rem;
+}
+.request-item:hover {
+    border-color: var(--gg-green);
+    color: var(--gg-ink);
+}
+.request-item.selected {
+    border: 2px solid var(--gg-green);
+}
+.ready-box {
+    background: var(--gg-green-soft);
+    border: 1px solid var(--gg-mint-border);
+    border-radius: 0.85rem;
+    padding: 1.25rem;
+}
+.ready-box h2 {
+    color: var(--gg-green-dark);
+}
+.counter-code {
+    background: #fff;
+    border-radius: 0.65rem;
+    padding: 0.85rem;
+    text-align: center;
+}
+.counter-code .mono {
+    font-size: 1.9rem;
+    font-weight: 600;
+}
+/* Status history: circles joined by a line */
+.stepper {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.stepper li {
+    position: relative;
+    display: flex;
+    gap: 0.9rem;
+    padding-bottom: 1.1rem;
+}
+.stepper li:not(:last-child)::before {     /* the line to the next step */
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: 0;
+    width: 3px;
+    background: var(--gg-green);
+}
+.stepper li.upcoming::before,
+.stepper li.next-upcoming::before {
+    background: #cfd6d3;
+}
+.stepper .mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: var(--gg-green);
+    color: #fff;
+    font-size: 1rem;
+}
+.stepper .mark-warning { background: #b7791f; }
+.stepper .mark-danger  { background: var(--gg-red-text); }
+.stepper li.upcoming .mark {
+    background: #fff;
+    border: 2px solid #8f9a96;
+    color: #8f9a96;
+}
+.stepper .step-name {
+    font-weight: 600;
+}
+.stepper li.current .step-name {
+    color: var(--gg-green-dark);
+}
+.stepper li.upcoming .step-name {
+    color: var(--gg-muted);
+}
+
+/* ---------- Admin dashboard ---------- */
 .chart-box {
     position: relative;
     height: 280px;
 }
+.status-bar {
+    height: 10px;
+    background: var(--gg-gray-soft);
+    border-radius: 999px;
+    overflow: hidden;
+}
+.status-bar span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+}
 
-/* When printing (reports): hide the menu, buttons, and footer */
+/* ---------- Notifications ---------- */
+.unread-note {
+    border-left: 4px solid var(--gg-green);
+}
+
+/* ---------- Login / register ---------- */
+.auth-card {
+    max-width: 440px;
+    margin: 2rem auto;
+}
+.register-card {
+    max-width: 780px;
+    margin: 0 auto;
+}
+
+/* When printing (reports): hide the menus, buttons, and footer */
 @media print {
-    nav, footer, .no-print {
+    .site-header, .site-footer, .admin-sidebar, .no-print {
         display: none !important;
+    }
+    .admin-main {
+        padding: 0;
     }
     body {
         background: #fff;
@@ -182,6 +925,7 @@ a {
     .card {
         break-inside: avoid;
         border-color: #999 !important;
+        box-shadow: none;
     }
     a {
         color: inherit;
@@ -189,31 +933,18 @@ a {
     }
 }
 
-/* Unread notification: green bar on the left */
-.unread-note {
-    border-left: 4px solid var(--gg-green);
+/* Wizard step 1: the relationship dropdown appears only when
+   "A family member" is chosen. :has() checks what is inside the form. */
+.relationship-field {
+    display: none;
+}
+form:has(#for-family:checked) .relationship-field {
+    display: block;
 }
 
-/* The ● in "● In stock" */
-.stock-dot {
-    font-size: 1.1em;
-    line-height: 1;
-}
-
-/* Bootstrap's "primary" badge and text use our green too */
-.text-bg-primary {
-    background-color: var(--gg-green) !important;
-}
-.text-primary {
-    color: var(--gg-green) !important;
-}
-
-/* Bigger tap targets on forms, for older users and phones */
-.form-control,
-.form-select,
-.btn {
-    min-height: 44px;
-}
-.btn-sm {
-    min-height: 0;
+/* Links inside result cards and lists: no underline, like the prototype */
+.result-card a,
+.ready-box a,
+.link-arrow {
+    text-decoration: none;
 }

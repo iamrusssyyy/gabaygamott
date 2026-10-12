@@ -105,7 +105,7 @@ require __DIR__ . '/../includes/header.php';
                     <li class="list-group-item d-flex justify-content-between flex-wrap gap-2">
                         <span><?= e(medicine_name($item)) ?></span>
                         <span class="small">
-                            <?= stock_dot((int) $item['quantity'], (int) $item['low_stock_threshold']) ?>
+                            <?= stock_pill((int) $item['quantity'], (int) $item['low_stock_threshold']) ?>
                             · <span class="text-muted">Updated <?= e(time_ago($item['last_updated_at'])) ?></span>
                         </span>
                     </li>
