@@ -99,87 +99,146 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // ---------------------------------------------------------------------
-// 3. Show the page
+// 3. Load the donor's 3 latest donations for the side panel
+// ---------------------------------------------------------------------
+$stmt = db()->prepare(
+    'SELECT d.id, d.quantity, d.status, m.generic_name
+     FROM donations d JOIN medicines m ON m.id = d.medicine_id
+     WHERE d.donor_id = ? ORDER BY d.created_at DESC LIMIT 3'
+);
+$stmt->execute([$user['id']]);
+$recent = $stmt->fetchAll();
+$my_donations_page = $user['role'] === 'pharmacy' ? 'pharmacy/dashboard.php' : 'donor/dashboard.php';
+
+// ---------------------------------------------------------------------
+// 4. Show the page (prototype "Donate")
 // ---------------------------------------------------------------------
 $page_title = 'Donate medicine';
 require __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="card register-card">
-    <div class="card-body p-4">
-        <h1 class="h3 mb-0">Donate medicine</h1>
-        <p class="text-muted">Mag-donate ng gamot na hindi nagamit</p>
+<div class="page-head">
+    <h1>Donate medicine</h1>
+    <div class="subtitle">Mag-donate ng gamot</div>
+</div>
 
-        <div class="alert alert-light border small">
-            We accept <strong>sealed, unopened</strong> medicine that expires on or after
-            <strong><?= e(format_date($earliest_expiry)) ?></strong>.
-            After an admin checks your listing, the GabayGamot team will contact you about drop-off.
+<div class="row g-4">
+    <!-- ===== Form ===== -->
+    <div class="col-12 col-lg-8">
+        <div class="card">
+            <div class="card-body p-4">
+                <?php if ($errors): ?>
+                    <div class="alert alert-danger py-2">Please fix the fields marked in red.</div>
+                <?php endif; ?>
+
+                <form method="post" action="<?= e(url('donor/donation_new.php')) ?>" enctype="multipart/form-data" novalidate>
+                    <?= csrf_field() ?>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="medicine_id" class="form-label">Medicine <span class="req">*</span></label>
+                            <select id="medicine_id" name="medicine_id" class="form-select<?= error_class($errors, 'medicine_id') ?>">
+                                <option value="">Choose the medicine…</option>
+                                <?php foreach ($medicines as $medicine): ?>
+                                    <option value="<?= (int) $medicine['id'] ?>" <?= $form['medicine_id'] === (string) $medicine['id'] ? 'selected' : '' ?>>
+                                        <?= e(medicine_name($medicine)) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <?= error_text($errors, 'medicine_id') ?>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="quantity" class="form-label">Quantity <span class="req">*</span></label>
+                            <input type="number" id="quantity" name="quantity" min="1" max="<?= MAX_DONATION_QUANTITY ?>"
+                                   class="form-control<?= error_class($errors, 'quantity') ?>" value="<?= e($form['quantity']) ?>">
+                            <div class="form-text">Count single units, e.g. 2 boxes of 100 tablets = 200.</div>
+                            <?= error_text($errors, 'quantity') ?>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="expiry_date" class="form-label">Expiry date <span class="req">*</span></label>
+                            <input type="date" id="expiry_date" name="expiry_date" min="<?= e($earliest_expiry) ?>"
+                                   class="form-control<?= error_class($errors, 'expiry_date') ?>" value="<?= e($form['expiry_date']) ?>">
+                            <?= error_text($errors, 'expiry_date') ?>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="lot_number" class="form-label">Batch or lot number <span class="small text-muted">(optional)</span></label>
+                            <input type="text" id="lot_number" name="lot_number" maxlength="50"
+                                   class="form-control<?= error_class($errors, 'lot_number') ?>" value="<?= e($form['lot_number']) ?>">
+                            <?= error_text($errors, 'lot_number') ?>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="donor_notes" class="form-label">Notes for the admin <span class="small text-muted">(optional)</span></label>
+                            <input type="text" id="donor_notes" name="donor_notes" maxlength="255"
+                                   class="form-control<?= error_class($errors, 'donor_notes') ?>" value="<?= e($form['donor_notes']) ?>"
+                                   placeholder="e.g. Two unopened boxes of 100 tablets">
+                            <?= error_text($errors, 'donor_notes') ?>
+                        </div>
+                        <div class="col-12">
+                            <label for="photo" class="form-label">Packaging photo <span class="req">*</span></label>
+                            <div class="upload-box d-flex flex-column flex-sm-row gap-3 align-items-sm-center">
+                                <span class="icon-tile"><i class="bi bi-camera"></i></span>
+                                <div class="flex-fill">
+                                    <input type="file" id="photo" name="photo" accept="image/jpeg,image/png"
+                                           class="form-control<?= error_class($errors, 'photo') ?>">
+                                    <div class="form-text">Show the label, seal, and expiry date. JPG or PNG, up to 5 MB.</div>
+                                    <?= error_text($errors, 'photo') ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input<?= error_class($errors, 'declaration') ?>" type="checkbox"
+                                       id="declaration" name="declaration" value="1">
+                                <label class="form-check-label" for="declaration">
+                                    I confirm these medicines are genuine, sealed and stored properly, and I consent to
+                                    GabayGamot processing my donation details (RA 10173). <span class="req">*</span>
+                                </label>
+                                <?= error_text($errors, 'declaration') ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="<?= e(url($my_donations_page)) ?>" class="btn btn-outline-primary btn-lg px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary btn-lg px-4">Submit donation</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Side panels ===== -->
+    <div class="col-12 col-lg-4">
+        <div class="card-soft p-4 mb-3">
+            <h2 class="h5">What we accept</h2>
+            <ul class="mb-0">
+                <li>Sealed, unopened packaging</li>
+                <li>Readable label with name and strength</li>
+                <li>Expiry on or after <strong><?= e(format_date($earliest_expiry)) ?></strong>
+                    (<?= MIN_DONATION_SHELF_DAYS ?> days from today)</li>
+                <li>The GabayGamot team contacts you about drop-off after review</li>
+            </ul>
         </div>
 
-        <?php if ($errors): ?>
-            <div class="alert alert-danger py-2">Please fix the fields marked in red.</div>
-        <?php endif; ?>
-
-        <form method="post" action="<?= e(url('donor/donation_new.php')) ?>" enctype="multipart/form-data" novalidate>
-            <?= csrf_field() ?>
-            <div class="row g-3">
-                <div class="col-12">
-                    <label for="medicine_id" class="form-label">Medicine</label>
-                    <select id="medicine_id" name="medicine_id" class="form-select<?= error_class($errors, 'medicine_id') ?>">
-                        <option value="">Choose the medicine…</option>
-                        <?php foreach ($medicines as $medicine): ?>
-                            <option value="<?= (int) $medicine['id'] ?>" <?= $form['medicine_id'] === (string) $medicine['id'] ? 'selected' : '' ?>>
-                                <?= e(medicine_name($medicine)) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <?= error_text($errors, 'medicine_id') ?>
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="h5 mb-0">Recent donations</h2>
+                    <a href="<?= e(url($my_donations_page)) ?>" class="small fw-semibold">See all</a>
                 </div>
-                <div class="col-12 col-md-6">
-                    <label for="quantity" class="form-label">Quantity</label>
-                    <input type="number" id="quantity" name="quantity" min="1" max="<?= MAX_DONATION_QUANTITY ?>"
-                           class="form-control<?= error_class($errors, 'quantity') ?>" value="<?= e($form['quantity']) ?>">
-                    <div class="form-text">Count single units, e.g. 3 boxes of 30 tablets = 90.</div>
-                    <?= error_text($errors, 'quantity') ?>
-                </div>
-                <div class="col-12 col-md-6">
-                    <label for="expiry_date" class="form-label">Expiry date</label>
-                    <input type="date" id="expiry_date" name="expiry_date" min="<?= e($earliest_expiry) ?>"
-                           class="form-control<?= error_class($errors, 'expiry_date') ?>" value="<?= e($form['expiry_date']) ?>">
-                    <?= error_text($errors, 'expiry_date') ?>
-                </div>
-                <div class="col-12 col-md-6">
-                    <label for="lot_number" class="form-label">Lot / batch no. <span class="small text-muted">(optional)</span></label>
-                    <input type="text" id="lot_number" name="lot_number" maxlength="50"
-                           class="form-control<?= error_class($errors, 'lot_number') ?>" value="<?= e($form['lot_number']) ?>">
-                    <?= error_text($errors, 'lot_number') ?>
-                </div>
-                <div class="col-12 col-md-6">
-                    <label for="photo" class="form-label">Photo of the packaging</label>
-                    <input type="file" id="photo" name="photo" accept="image/jpeg,image/png"
-                           class="form-control<?= error_class($errors, 'photo') ?>">
-                    <div class="form-text">Show the name, strength, and expiry date. JPG or PNG, up to 5 MB.</div>
-                    <?= error_text($errors, 'photo') ?>
-                </div>
-                <div class="col-12">
-                    <label for="donor_notes" class="form-label">Notes <span class="small text-muted">(optional)</span></label>
-                    <input type="text" id="donor_notes" name="donor_notes" maxlength="255"
-                           class="form-control<?= error_class($errors, 'donor_notes') ?>" value="<?= e($form['donor_notes']) ?>">
-                    <?= error_text($errors, 'donor_notes') ?>
-                </div>
-                <div class="col-12">
-                    <div class="form-check">
-                        <input class="form-check-input<?= error_class($errors, 'declaration') ?>" type="checkbox"
-                               id="declaration" name="declaration" value="1">
-                        <label class="form-check-label" for="declaration">
-                            I confirm this medicine is sealed, unused, and was stored as the label says.
-                        </label>
-                        <?= error_text($errors, 'declaration') ?>
-                    </div>
-                </div>
+                <?php if (!$recent): ?>
+                    <p class="small text-muted mb-0">Your donations will appear here.</p>
+                <?php endif; ?>
+                <?php foreach ($recent as $i => $item): ?>
+                    <a href="<?= e(url('donor/donation_view.php?id=' . $item['id'])) ?>"
+                       class="d-flex justify-content-between align-items-center py-2 text-decoration-none text-reset <?= $i > 0 ? 'border-top' : '' ?>">
+                        <span>
+                            <span class="mono d-block">#<?= (int) $item['id'] ?></span>
+                            <span class="small text-muted"><?= e($item['generic_name']) ?> · <?= (int) $item['quantity'] ?></span>
+                        </span>
+                        <?= donation_badge($item['status']) ?>
+                    </a>
+                <?php endforeach; ?>
             </div>
-            <button type="submit" class="btn btn-primary btn-lg w-100 mt-4">List donation</button>
-        </form>
+        </div>
     </div>
 </div>
 

@@ -43,7 +43,7 @@ $page_title = 'Donations';
 require __DIR__ . '/../includes/header.php';
 ?>
 
-<h1 class="h3 mb-3">Donations</h1>
+<div class="page-head"><h1>Donations</h1><div class="subtitle">Verify listings with the checklist, then route approved units to requests.</div></div>
 
 <ul class="nav nav-tabs mb-3">
     <?php foreach (DONATION_STATUSES as $status => $info): ?>
@@ -51,13 +51,13 @@ require __DIR__ . '/../includes/header.php';
             <a class="nav-link<?= $tab === $status ? ' active' : '' ?>"
                href="<?= e(url('admin/donations.php?status=' . $status)) ?>">
                 <?= e($info['label']) ?>
-                <span class="badge text-bg-<?= e($info['color']) ?>"><?= (int) ($counts[$status] ?? 0) ?></span>
+                · <?= (int) ($counts[$status] ?? 0) ?>
             </a>
         </li>
     <?php endforeach; ?>
 </ul>
 
-<div class="table-responsive bg-white border rounded">
+<div class="table-card table-responsive">
     <table class="table align-middle mb-0">
         <thead>
             <tr><th>#</th><th>Medicine</th><th>Qty</th><?= $tab === 'approved' ? '<th>Left</th>' : '' ?><th>Expires</th><th>Donor</th><th>Listed</th><th></th></tr>

@@ -119,7 +119,7 @@ $page_title = 'Medicine catalog';
 require __DIR__ . '/../includes/header.php';
 ?>
 
-<h1 class="h3 mb-3">Medicine catalog</h1>
+<div class="page-head"><h1>Medicine catalog</h1><div class="subtitle">Pharmacies, beneficiaries, and donors choose medicines from this list.</div></div>
 
 <div class="row g-4">
     <!-- Add / edit form -->
@@ -192,7 +192,7 @@ require __DIR__ . '/../includes/header.php';
             <button type="submit" class="btn btn-outline-secondary">Search</button>
         </form>
 
-        <div class="table-responsive bg-white border rounded">
+        <div class="table-card table-responsive">
             <table class="table align-middle mb-0">
                 <thead>
                     <tr><th>Medicine</th><th>Per</th><th>Pharmacies</th><th>Shown</th><th></th></tr>

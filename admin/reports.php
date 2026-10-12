@@ -144,7 +144,7 @@ $donation_totals = array_column($donations_by_status, null, 'status');
     </div>
 </form>
 
-<h1 class="h3 mb-0">GabayGamot Report</h1>
+<h1 class="fw-bold mb-0">GabayGamot Report</h1>
 <p class="text-muted">
     <?= e(format_date($from)) ?> to <?= e(format_date($to)) ?> ·
     generated <?= e(format_datetime(date('Y-m-d H:i:s'))) ?> by <?= e(current_user()['full_name']) ?>

@@ -46,7 +46,7 @@ require __DIR__ . '/../includes/header.php';
 ?>
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-    <h1 class="h3 mb-0">Assistance requests</h1>
+    <div class="page-head mb-0"><h1>Medicine requests</h1><div class="subtitle">Most urgent first: people with no medicine left are at the top.</div></div>
     <form method="get" action="<?= e(url('admin/requests.php')) ?>" class="d-flex gap-2">
         <input type="hidden" name="status" value="<?= e($tab) ?>">
         <input type="search" name="q" class="form-control" value="<?= e($search) ?>"
@@ -61,7 +61,7 @@ require __DIR__ . '/../includes/header.php';
             <a class="nav-link text-nowrap<?= $tab === $status ? ' active' : '' ?>"
                href="<?= e(url('admin/requests.php?status=' . $status)) ?>">
                 <?= e($info['label']) ?>
-                <span class="badge text-bg-<?= e($info['color']) ?>"><?= (int) ($counts[$status] ?? 0) ?></span>
+                · <?= (int) ($counts[$status] ?? 0) ?>
             </a>
         </li>
     <?php endforeach; ?>
@@ -69,7 +69,7 @@ require __DIR__ . '/../includes/header.php';
 
 <p class="small text-muted"><?= e(REQUEST_STATUSES[$tab]['help']) ?></p>
 
-<div class="table-responsive bg-white border rounded">
+<div class="table-card table-responsive">
     <table class="table align-middle mb-0">
         <thead>
             <tr><th>Reference</th><th>Patient</th><th>Medicine</th><th>Left</th><th>Program</th><th>Docs</th><th>Submitted</th><th></th></tr>
@@ -77,7 +77,7 @@ require __DIR__ . '/../includes/header.php';
         <tbody>
         <?php foreach ($requests as $request): ?>
             <tr>
-                <td class="text-nowrap"><?= e($request['reference_no']) ?></td>
+                <td class="text-nowrap mono fw-semibold"><?= e($request['reference_no']) ?></td>
                 <td>
                     <?= e($request['patient_name']) ?>
                     <div class="small text-muted"><?= age_from_birthdate($request['patient_birthdate']) ?> yrs · <?= e($request['patient_city']) ?></div>

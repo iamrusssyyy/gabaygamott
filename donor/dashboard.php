@@ -47,13 +47,13 @@ require __DIR__ . '/../includes/header.php';
 
 <div class="row g-3 mb-4">
     <div class="col-4"><div class="card h-100"><div class="card-body">
-        <div class="small text-muted">Donations listed</div><div class="fs-3 fw-semibold"><?= $total_listed ?></div>
+        <div class="kpi-label">Donations listed</div><div class="kpi-value"><?= $total_listed ?></div>
     </div></div></div>
     <div class="col-4"><div class="card h-100"><div class="card-body">
-        <div class="small text-muted">Units approved</div><div class="fs-3 fw-semibold"><?= number_format($units_approved) ?></div>
+        <div class="kpi-label">Units approved</div><div class="kpi-value"><?= number_format($units_approved) ?></div>
     </div></div></div>
     <div class="col-4"><div class="card h-100"><div class="card-body">
-        <div class="small text-muted">Units routed to patients</div><div class="fs-3 fw-semibold"><?= number_format($units_routed) ?></div>
+        <div class="kpi-label">Units routed to patients</div><div class="kpi-value"><?= number_format($units_routed) ?></div>
     </div></div></div>
 </div>
 

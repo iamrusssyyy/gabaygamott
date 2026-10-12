@@ -233,10 +233,13 @@ $page_scripts = ['assets/js/register.js'];
 require __DIR__ . '/includes/header.php';
 ?>
 
-<div class="card shadow-sm register-card">
+<div class="register-card page-head">
+    <h1>Create an account</h1>
+    <div class="subtitle">Gumawa ng account</div>
+</div>
+
+<div class="card register-card">
     <div class="card-body p-4">
-        <h1 class="h3 mb-1">Create an account</h1>
-        <p class="text-muted mb-4">Gumawa ng account</p>
 
         <?php if ($errors): ?>
             <div class="alert alert-danger" role="alert">
@@ -249,16 +252,19 @@ require __DIR__ . '/includes/header.php';
 
             <!-- ===== Step A: what kind of account ===== -->
             <fieldset class="mb-4">
-                <legend class="h6">What do you need GabayGamot for?</legend>
+                <legend class="form-label fs-6">I am registering as <span class="req">*</span></legend>
                 <div class="row g-2">
                     <?php foreach ($register_roles as $value => $labels): ?>
                         <div class="col-12 col-md-6">
-                            <label class="role-option d-flex gap-2 border rounded p-3">
-                                <input class="form-check-input mt-1" type="radio" name="role"
+                            <label class="choice-card">
+                                <input class="form-check-input" type="radio" name="role"
                                        value="<?= e($value) ?>" <?= $form['role'] === $value ? 'checked' : '' ?>>
                                 <span>
                                     <strong><?= e($labels[0]) ?></strong><br>
                                     <span class="small text-muted"><?= e($labels[1]) ?></span>
+                                    <?php if (in_array($value, ['pharmacy', 'partner'], true)): ?>
+                                        <br><span class="pill pill-amber mt-1">Needs admin approval</span>
+                                    <?php endif; ?>
                                 </span>
                             </label>
                         </div>
@@ -435,6 +441,12 @@ require __DIR__ . '/includes/header.php';
             </div>
 
             <!-- ===== Data Privacy Act consent (RA 10173) ===== -->
+            <div class="card-soft p-3 mb-3">
+                <div class="fw-semibold mb-1" style="color: var(--gg-green-dark)"><i class="bi bi-shield-check"></i> Data privacy (RA 10173)</div>
+                <p class="small mb-0">We collect your name, contact details and, for requests, medical and income documents,
+                    only to process medicine assistance. Only you, GabayGamot admins, and the partner program matched
+                    to your request can see your documents.</p>
+            </div>
             <div class="form-check mb-4">
                 <input class="form-check-input<?= error_class($errors, 'privacy_consent') ?>" type="checkbox"
                        id="privacy_consent" name="privacy_consent" value="1">

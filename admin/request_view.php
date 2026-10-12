@@ -126,30 +126,25 @@ $page_title = 'Request ' . $request['reference_no'];
 require __DIR__ . '/../includes/header.php';
 ?>
 
-<a href="<?= e(url('admin/requests.php?status=' . $request['status'])) ?>" class="small">← Requests</a>
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2 mb-3">
-    <div>
-        <h1 class="h3 mb-0"><?= e($request['reference_no']) ?></h1>
-        <div class="text-muted small">
-            Submitted <?= e(format_datetime($request['submitted_at'])) ?> by
-            <?= e($request['beneficiary_name']) ?> · <?= e($request['beneficiary_email']) ?>
-            <?= $request['beneficiary_phone'] ? ' · ' . e($request['beneficiary_phone']) : '' ?>
-        </div>
+<div class="page-head">
+    <a href="<?= e(url('admin/requests.php?status=' . $request['status'])) ?>" class="small text-decoration-none">← Requests</a>
+    <h1 class="mono mt-1"><?= e($request['reference_no']) ?></h1>
+    <div class="subtitle">
+        Submitted <?= e(format_datetime($request['submitted_at'])) ?> by
+        <?= e($request['beneficiary_name']) ?> · <?= e($request['beneficiary_email']) ?>
+        <?= $request['beneficiary_phone'] ? ' · ' . e($request['beneficiary_phone']) : '' ?>
     </div>
-    <div class="fs-5"><?= request_badge($request['status']) ?> <?= urgency_badge($request['supply_left']) ?></div>
 </div>
 
-<?php if ($request['status_note']): ?>
-    <div class="alert alert-light border small"><strong>Latest note:</strong> <?= e($request['status_note']) ?></div>
-<?php endif; ?>
-
+<!-- Details on the left; actions and donation routing on the right -->
 <div class="row g-4">
-    <div class="col-12 col-lg-6">
-        <?php require __DIR__ . '/../includes/request_actions.php'; ?>
+    <div class="col-12 col-lg-7 order-2 order-lg-1">
+        <?php require __DIR__ . '/../includes/request_details.php'; ?>
     </div>
+    <div class="col-12 col-lg-5 order-1 order-lg-2">
+        <?php require __DIR__ . '/../includes/request_actions.php'; ?>
 
-    <!-- Routing donated medicine -->
-    <div class="col-12 col-lg-6">
+        <!-- Routing donated medicine -->
         <div class="card mb-4">
             <div class="card-body">
                 <h2 class="h5">Donated medicine for this request</h2>
@@ -198,7 +193,5 @@ require __DIR__ . '/../includes/header.php';
         </div>
     </div>
 </div>
-
-<?php require __DIR__ . '/../includes/request_details.php'; ?>
 
 <?php require __DIR__ . '/../includes/footer.php'; ?>

@@ -113,13 +113,13 @@ $page_title = 'Accounts';
 require __DIR__ . '/../includes/header.php';
 ?>
 
-<h1 class="h3 mb-3">Accounts</h1>
+<div class="page-head"><h1>Accounts</h1><div class="subtitle">Pharmacy and partner accounts need approval before they can log in.</div></div>
 
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item">
         <a class="nav-link<?= $tab === 'pending' ? ' active' : '' ?>" href="<?= e(url('admin/users.php')) ?>">
             Waiting for approval
-            <?php if ($pending): ?><span class="badge text-bg-warning"><?= count($pending) ?></span><?php endif; ?>
+            <?php if ($pending): ?><span class="pill pill-amber"><?= count($pending) ?> pending</span><?php endif; ?>
         </a>
     </li>
     <li class="nav-item">
@@ -140,7 +140,7 @@ require __DIR__ . '/../includes/header.php';
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
                             <h2 class="h5 mb-1"><?= e($account['full_name']) ?></h2>
-                            <span class="badge text-bg-light border"><?= e($account['role']) ?></span>
+                            <span class="role-tag"><?= e(ucfirst($account['role'])) ?></span>
                         </div>
                         <p class="small text-muted mb-2">
                             Signed up <?= e(time_ago($account['created_at'])) ?> ·
@@ -218,7 +218,7 @@ require __DIR__ . '/../includes/header.php';
         </div>
     </form>
 
-    <div class="table-responsive bg-white border rounded">
+    <div class="table-card table-responsive">
         <table class="table align-middle mb-0">
             <thead>
                 <tr><th>Name</th><th>Role</th><th>City</th><th>Status</th><th>Last login</th><th></th></tr>

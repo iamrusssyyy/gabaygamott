@@ -15,7 +15,7 @@ Reference documents (read these before major work):
 ## Tech stack (FIXED — never switch)
 
 - Plain **PHP 8** (no framework), **MySQL/MariaDB**, HTML, CSS, vanilla JavaScript
-- **Bootstrap 5** via CDN for layout and components
+- **Bootstrap 5** via CDN for layout and components (plus **Bootstrap Icons** via CDN)
 - **Leaflet + OpenStreetMap** for maps, **Chart.js** for charts (both via CDN)
 - Font: **IBM Plex Sans** (Google Fonts)
 - Runs locally on **XAMPP** at `http://localhost/gabaygamot`
@@ -105,12 +105,24 @@ asking.
 - **Wireframe directions to build:** landing **1b/2b "Two doors"**, search results
   **1e/2e "List + filter sidebar"**, request form **1h/2h "4-step wizard"**.
 
-## UI notes from the wireframes
+## UI notes (design follows the high-fidelity prototype, 2026-10-12)
+- The student's hi-fi prototype ("GabayGamot Prototype" PNGs: desktop + mobile
+  screens) is the visual reference; it refines the wireframes.
+- Theme lives in `assets/css/style.css` as CSS variables: deep green `--gg-green`,
+  mint `--gg-mint`, amber accent, light gray-green page, white rounded cards,
+  dark footer. Admins get a dark green sidebar layout; everyone else a white header.
+- Status labels are soft **pills** (`pill()`, `request_badge()`, `stock_pill()` in
+  `includes/labels.php`): green = good, amber = needs attention, red = stopped,
+  blue = in progress, gray = finished. Stock: "In stock · 240" etc.
+- Icons: **Bootstrap Icons** via CDN (`<i class="bi bi-search"></i>`).
+- Reference numbers use IBM Plex Mono (`.mono`).
 - Mobile-first (360px), then desktop (1280px). Large tap targets; plain language.
-- Show bilingual helper text where the wireframes do (English + Filipino),
-  e.g. "Find your medicine nearby / Hanapin ang gamot na malapit sa iyo".
-- Stock status dots: ● In stock · ● Low stock · ● Out of stock.
-- Inline form errors directly under the field.
+- Show bilingual helper text where the prototype does (English + Filipino),
+  e.g. "Find medicine / Maghanap ng gamot".
+- Inline form errors directly under the field; red `*` (`.req`) on required labels.
+- Prototype extras NOT built (out of scope or need a decision): EN/FIL toggle,
+  "preferred program" question in the wizard, admin "System settings" panel,
+  emailed alerts, expiring document links, date-range filter on the dashboard.
 
 ## Coding conventions
 - One PHP page per screen; shared pieces in `includes/` (`header.php`, `footer.php`,
@@ -151,12 +163,14 @@ All three modules are built. Where things live:
 | `includes/labels.php` | Status names/colors, dropdown choices, badge helpers |
 | `includes/upload.php` | `save_upload()` (finfo type check, 5 MB, random names, outside htdocs) |
 | `includes/requests.php` | Request loading, allowed status transitions, `process_request_action()` |
-| `includes/request_details.php`, `request_actions.php` | Shared request details/timeline and action buttons |
+| `includes/request_details.php`, `request_actions.php` | Shared request details (admin/partner) and the one-form action panel |
+| `includes/status_history.php` | "Status history" stepper used by beneficiary, partner, and admin pages |
+| `includes/my_requests_list.php`, `my_request_detail.php` | Beneficiary "My requests" list and detail (with "Your medicine is ready") |
 | `includes/alerts.php` | Automated near-expiry and low-stock alerts (`run_alert_checks()`) |
 | `locator/search.php` + `assets/js/locator.js` | Public Medicine Locator, wireframe 2e (list/map, filters, best picks) |
 | `beneficiary/` | `request_new.php` 4-step wizard (2h), `request_view.php` tracking, `dashboard.php` |
 | `donor/` | `donation_new.php`, `donation_view.php`, `dashboard.php` (pharmacies may donate too) |
-| `pharmacy/` | `stock.php` stock and price updates, `dashboard.php` |
+| `pharmacy/` | `stock.php` "Stock & prices" table (home page for pharmacies), `dashboard.php` "Overview" |
 | `partner/` | `dashboard.php`, `request_view.php` (only requests matched to their program) |
 | `admin/` | `dashboard.php` (KPIs, alerts, Chart.js), `requests.php`, `request_view.php` (actions and donation routing), `donations.php`, `donation_view.php` (checklist), `users.php` (approvals), `medicines.php` (catalog), `reports.php` (printable) |
 | `files/view.php` | The only way to open uploaded files (permission check) |

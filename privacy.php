@@ -12,7 +12,7 @@ $page_title = 'Privacy Notice';
 require __DIR__ . '/includes/header.php';
 ?>
 
-<div class="card shadow-sm register-card">
+<div class="card register-card">
     <div class="card-body p-4">
         <h1 class="h3">Privacy Notice</h1>
         <p class="text-muted">Abiso sa Privacy · Republic Act No. 10173 (Data Privacy Act of 2012)</p>

@@ -57,36 +57,38 @@ $page_title = 'Pharmacy dashboard';
 require __DIR__ . '/../includes/header.php';
 ?>
 
-<h1 class="h3 mb-1"><?= e($pharmacy['name']) ?><?= $pharmacy['branch'] ? ' · ' . e($pharmacy['branch']) : '' ?></h1>
-<p class="text-muted">
+<div class="page-head">
+<h1><?= e($pharmacy['name']) ?><?= $pharmacy['branch'] ? ' · ' . e($pharmacy['branch']) : '' ?></h1>
+<div class="subtitle">
     <?= e($pharmacy['address']) ?>, <?= e($pharmacy['city']) ?> ·
     <?= e($pharmacy['phone'] ?? '') ?> · <?= e($pharmacy['opening_hours'] ?? 'Hours not set') ?>
-</p>
+</div>
+</div>
 
 <!-- Summary numbers -->
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
         <div class="card h-100"><div class="card-body">
-            <div class="small text-muted">Medicines listed</div>
-            <div class="fs-3 fw-semibold"><?= (int) $summary['total'] ?></div>
+            <div class="kpi-label">Items listed</div>
+            <div class="kpi-value"><?= (int) $summary['total'] ?></div>
         </div></div>
     </div>
     <div class="col-6 col-md-3">
         <div class="card h-100"><div class="card-body">
-            <div class="small text-muted"><span class="text-success">●</span> In stock</div>
-            <div class="fs-3 fw-semibold"><?= (int) $summary['in_stock'] ?></div>
+            <div class="kpi-label">In stock</div>
+            <div class="kpi-value"><?= (int) $summary['in_stock'] ?></div>
         </div></div>
     </div>
     <div class="col-6 col-md-3">
         <div class="card h-100"><div class="card-body">
-            <div class="small text-muted"><span class="text-warning">●</span> Low stock</div>
-            <div class="fs-3 fw-semibold"><?= (int) $summary['low'] ?></div>
+            <div class="kpi-label">Low stock</div>
+            <div class="kpi-value"><?= (int) $summary['low'] ?></div>
         </div></div>
     </div>
     <div class="col-6 col-md-3">
         <div class="card h-100"><div class="card-body">
-            <div class="small text-muted"><span class="text-danger">●</span> Out of stock</div>
-            <div class="fs-3 fw-semibold"><?= (int) $summary['out_of_stock'] ?></div>
+            <div class="kpi-label">Out of stock</div>
+            <div class="kpi-value"><?= (int) $summary['out_of_stock'] ?></div>
         </div></div>
     </div>
 </div>
@@ -106,7 +108,7 @@ require __DIR__ . '/../includes/header.php';
                         <span><?= e(medicine_name($item)) ?></span>
                         <span class="small">
                             <?= stock_pill((int) $item['quantity'], (int) $item['low_stock_threshold']) ?>
-                            · <span class="text-muted">Updated <?= e(time_ago($item['last_updated_at'])) ?></span>
+                            <span class="text-muted ms-1">Updated <?= e(time_ago($item['last_updated_at'])) ?></span>
                         </span>
                     </li>
                 <?php endforeach; ?>

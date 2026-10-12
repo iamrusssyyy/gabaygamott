@@ -948,3 +948,18 @@ form:has(#for-family:checked) .relationship-field {
 .link-arrow {
     text-decoration: none;
 }
+
+/* Lists (notifications, donations, attention items) look like our cards */
+.list-group {
+    --bs-list-group-border-color: var(--gg-border);
+    --bs-list-group-border-radius: 0.85rem;
+}
+.list-group-item {
+    padding: 0.85rem 1.1rem;
+}
+
+/* Page titles written as <h1 class="h3"> get the same size as .page-head h1 */
+h1.h3 {
+    font-size: 1.85rem;
+    font-weight: 700;
+}

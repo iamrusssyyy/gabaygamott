@@ -319,8 +319,8 @@ $next_title  = $steps[$step + 1]['title'] ?? '';
 
 <div class="row g-4">
 
-    <!-- ===== Left: step list (desktop) and privacy note ===== -->
-    <div class="col-12 col-lg-4">
+    <!-- ===== Left: step list (desktop) and privacy note (below the form on phones) ===== -->
+    <div class="col-12 col-lg-4 order-2 order-lg-1">
         <div class="card mb-3 d-none d-lg-block">
             <ol class="step-rail">
                 <?php foreach ($steps as $number => $info): ?>
@@ -363,7 +363,7 @@ $next_title  = $steps[$step + 1]['title'] ?? '';
     </div>
 
     <!-- ===== Right: the current step in a white card ===== -->
-    <div class="col-12 col-lg-8">
+    <div class="col-12 col-lg-8 order-1 order-lg-2">
         <div class="card">
             <div class="card-body p-4">
                 <h2 class="h4 mb-0"><?= e($steps[$step]['question']) ?></h2>

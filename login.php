@@ -69,7 +69,7 @@ $page_title = 'Log in';
 require __DIR__ . '/includes/header.php';
 ?>
 
-<div class="card shadow-sm auth-card">
+<div class="card auth-card">
     <div class="card-body p-4">
         <h1 class="h3 mb-1">Log in</h1>
         <p class="text-muted mb-4">Mag-log in sa iyong account</p>

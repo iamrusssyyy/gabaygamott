@@ -40,18 +40,21 @@ $page_title = 'Request ' . $request['reference_no'];
 require __DIR__ . '/../includes/header.php';
 ?>
 
-<a href="<?= e(url('partner/dashboard.php?status=' . $request['status'])) ?>" class="small">← Matched requests</a>
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2 mb-3">
-    <h1 class="h3 mb-0"><?= e($request['reference_no']) ?></h1>
-    <div class="fs-5"><?= request_badge($request['status']) ?> <?= urgency_badge($request['supply_left']) ?></div>
+<div class="page-head">
+    <a href="<?= e(url('partner/dashboard.php?status=' . $request['status'])) ?>" class="small text-decoration-none">← Matched requests</a>
+    <h1 class="mono mt-1"><?= e($request['reference_no']) ?></h1>
 </div>
 
-<div class="row">
-    <div class="col-12 col-lg-7">
-        <?php require __DIR__ . '/../includes/request_actions.php'; ?>
+<!-- Details on the left, the action panel on the right (stays in view while scrolling) -->
+<div class="row g-4">
+    <div class="col-12 col-lg-7 order-2 order-lg-1">
+        <?php require __DIR__ . '/../includes/request_details.php'; ?>
+    </div>
+    <div class="col-12 col-lg-5 order-1 order-lg-2">
+        <div class="map-sticky">
+            <?php require __DIR__ . '/../includes/request_actions.php'; ?>
+        </div>
     </div>
 </div>
-
-<?php require __DIR__ . '/../includes/request_details.php'; ?>
 
 <?php require __DIR__ . '/../includes/footer.php'; ?>

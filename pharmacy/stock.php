@@ -136,7 +136,7 @@ $stmt = db()->prepare(
 $stmt->execute([$pharmacy_id]);
 $items = $stmt->fetchAll();
 
-// Medicines this pharmacy has NOT listed yet (for the "Add" dropdown)
+// Medicines this pharmacy has NOT listed yet (for the "Add medicine" form)
 $stmt = db()->prepare(
     'SELECT id, generic_name, brand_name, strength, dosage_form, unit
      FROM medicines
@@ -147,38 +147,75 @@ $stmt = db()->prepare(
 $stmt->execute([$pharmacy_id]);
 $unlisted = $stmt->fetchAll();
 
+// Numbers for the 4 tiles at the top
+$low_count = 0;
+$out_count = 0;
+$oldest_update = null;
+foreach ($items as $item) {
+    $code = stock_status((int) $item['quantity'], (int) $item['low_stock_threshold'])['code'];
+    if ($code === 'low') {
+        $low_count++;
+    } elseif ($code === 'out') {
+        $out_count++;
+    }
+    if ($oldest_update === null || $item['last_updated_at'] < $oldest_update) {
+        $oldest_update = $item['last_updated_at'];
+    }
+}
+
 // ---------------------------------------------------------------------
-// 4. Show the page
+// 4. Show the page (prototype "Pharmacy stock & prices")
 // ---------------------------------------------------------------------
-$page_title = 'My stock';
+$page_title   = 'Stock & prices';
+$page_scripts = ['assets/js/stock.js'];
 require __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 page-head">
     <div>
-        <h1 class="h3 mb-0">My stock</h1>
-        <p class="text-muted mb-0"><?= e($pharmacy['name']) ?><?= $pharmacy['branch'] ? ' · ' . e($pharmacy['branch']) : '' ?></p>
+        <h1>Stock &amp; prices</h1>
+        <div class="subtitle">Buyers see these with the time you last saved.</div>
     </div>
-    <?php if ($items): ?>
-        <form method="post" action="<?= e(url('pharmacy/stock.php')) ?>">
-            <?= csrf_field() ?>
-            <input type="hidden" name="action" value="confirm_all">
-            <button type="submit" class="btn btn-outline-primary">Confirm all are still correct</button>
-        </form>
-    <?php endif; ?>
+    <div class="d-flex flex-wrap gap-2">
+        <div class="search-field" style="min-width: 240px">
+            <i class="bi bi-search"></i>
+            <input type="search" id="item-search" class="form-control" placeholder="Search your items" aria-label="Search your items">
+        </div>
+        <!-- Opens the "Add medicine" form below (Bootstrap "collapse") -->
+        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#add-form"
+                aria-expanded="false" aria-controls="add-form">+ Add medicine</button>
+    </div>
 </div>
-<p class="small text-muted">
-    The public sees your quantity, price, and when you last updated each item.
-    Update often so people don't make a wasted trip.
-</p>
 
-<!-- Add a medicine -->
-<div class="card mb-4">
-    <div class="card-body">
-        <h2 class="h6">Add a medicine</h2>
+<!-- Summary tiles -->
+<div class="row g-3 mb-3">
+    <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body">
+        <div class="kpi-label">Items listed</div><div class="kpi-value"><?= count($items) ?></div>
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body">
+        <div class="kpi-label">Low stock</div><div class="kpi-value" style="color: var(--gg-amber-text)"><?= $low_count ?></div>
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body">
+        <div class="kpi-label">Out of stock</div><div class="kpi-value" style="color: var(--gg-red-text)"><?= $out_count ?></div>
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body">
+        <div class="kpi-label">Oldest update</div><div class="kpi-value"><?= $oldest_update ? e(time_ago($oldest_update)) : '—' ?></div>
+    </div></div></div>
+</div>
+
+<?php if ($low_count + $out_count > 0): ?>
+    <div class="notice notice-amber mb-3">
+        <span><strong><?= $low_count + $out_count ?> <?= $low_count + $out_count === 1 ? 'item needs' : 'items need' ?> restocking.</strong>
+            You also get a notification when an item runs low.</span>
+    </div>
+<?php endif; ?>
+
+<!-- Add a medicine (hidden until "+ Add medicine" is pressed) -->
+<div class="collapse mb-3" id="add-form">
+    <div class="card"><div class="card-body">
+        <h2 class="h5">Add a medicine</h2>
         <?php if (!$unlisted): ?>
-            <p class="small text-muted mb-0">You already list every medicine in the catalog.
-                Ask the admin to add a medicine that is missing.</p>
+            <p class="small text-muted mb-0">You already list every medicine in the catalog. Ask the admin to add a missing one.</p>
         <?php else: ?>
             <form method="post" action="<?= e(url('pharmacy/stock.php')) ?>" class="row g-2 align-items-end">
                 <?= csrf_field() ?>
@@ -196,7 +233,7 @@ require __DIR__ . '/../includes/header.php';
                     <input type="number" id="add_quantity" name="quantity" min="0" step="1" class="form-control" required>
                 </div>
                 <div class="col-4 col-md-2">
-                    <label for="add_price" class="form-label small">Price (₱ per unit)</label>
+                    <label for="add_price" class="form-label small">Price / unit (₱)</label>
                     <input type="number" id="add_price" name="price" min="0.01" step="0.01" class="form-control" required>
                 </div>
                 <div class="col-4 col-md-1">
@@ -208,59 +245,70 @@ require __DIR__ . '/../includes/header.php';
                 </div>
             </form>
         <?php endif; ?>
-    </div>
+    </div></div>
 </div>
 
-<!-- Current stock: one small form per medicine -->
 <?php if (!$items): ?>
-    <p class="text-muted">You have not listed any medicines yet. Add one above.</p>
-<?php endif; ?>
+    <p class="text-muted">You have not listed any medicines yet. Press “+ Add medicine”.</p>
+<?php else: ?>
+    <!-- The stock table. Each row has its own small form: the inputs say
+         form="row-ID", which links them to the <form id="row-ID"> in the
+         last cell (an HTML form can't wrap a table row). -->
+    <div class="table-card table-responsive">
+        <table class="table align-middle" id="stock-table">
+            <thead>
+                <tr>
+                    <th>Medicine</th><th style="width: 9rem">Quantity</th><th style="width: 9rem">Price / unit (₱)</th>
+                    <th style="width: 7rem">Alert at</th><th>Status</th><th>Last updated</th><th></th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($items as $item): ?>
+                <?php $form_id = 'row-' . (int) $item['id']; ?>
+                <tr data-name="<?= e(strtolower(medicine_name($item))) ?>">
+                    <td>
+                        <div class="fw-semibold"><?= e($item['brand_name'] !== '' ? $item['brand_name'] : $item['generic_name']) ?> <?= e($item['strength']) ?></div>
+                        <div class="small text-muted">
+                            <?= e(ucfirst($item['dosage_form'])) ?> · <?= e($item['brand_name'] !== '' ? strtolower($item['generic_name']) : 'generic') ?>
+                        </div>
+                    </td>
+                    <td><input type="number" name="quantity" min="0" step="1" form="<?= $form_id ?>"
+                               value="<?= (int) $item['quantity'] ?>" class="form-control" aria-label="Quantity"></td>
+                    <td><input type="number" name="price" min="0.01" step="0.01" form="<?= $form_id ?>"
+                               value="<?= e($item['price']) ?>" class="form-control" aria-label="Price per unit"></td>
+                    <td><input type="number" name="low_stock_threshold" min="0" step="1" form="<?= $form_id ?>"
+                               value="<?= (int) $item['low_stock_threshold'] ?>" class="form-control" aria-label="Low-stock alert level"></td>
+                    <td><?= stock_pill((int) $item['quantity'], (int) $item['low_stock_threshold'], false) ?></td>
+                    <td class="text-muted text-nowrap"><?= e(time_ago($item['last_updated_at'])) ?></td>
+                    <td class="text-end text-nowrap">
+                        <form method="post" action="<?= e(url('pharmacy/stock.php')) ?>" id="<?= $form_id ?>" class="d-inline">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="action" value="update">
+                            <input type="hidden" name="stock_id" value="<?= (int) $item['id'] ?>">
+                            <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                        </form>
+                        <form method="post" action="<?= e(url('pharmacy/stock.php')) ?>" class="d-inline"
+                              onsubmit="return confirm('Remove this medicine from your list?');">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="action" value="remove">
+                            <input type="hidden" name="stock_id" value="<?= (int) $item['id'] ?>">
+                            <button type="submit" class="btn btn-sm btn-link text-danger" aria-label="Remove"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 
-<div class="list-group">
-    <?php foreach ($items as $item): ?>
-        <div class="list-group-item py-3">
-            <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
-                <strong><?= e(medicine_name($item)) ?></strong>
-                <span class="small">
-                    <?= stock_pill((int) $item['quantity'], (int) $item['low_stock_threshold']) ?>
-                    · <span class="text-muted">Updated <?= e(time_ago($item['last_updated_at'])) ?></span>
-                </span>
-            </div>
-            <div class="d-flex flex-wrap gap-2 align-items-end">
-                <form method="post" action="<?= e(url('pharmacy/stock.php')) ?>" class="row g-2 align-items-end flex-grow-1">
-                    <?= csrf_field() ?>
-                    <input type="hidden" name="action" value="update">
-                    <input type="hidden" name="stock_id" value="<?= (int) $item['id'] ?>">
-                    <div class="col-4 col-md-3">
-                        <label class="form-label small" for="qty-<?= (int) $item['id'] ?>">Quantity (<?= e($item['unit']) ?>s)</label>
-                        <input type="number" id="qty-<?= (int) $item['id'] ?>" name="quantity" min="0" step="1"
-                               value="<?= (int) $item['quantity'] ?>" class="form-control">
-                    </div>
-                    <div class="col-4 col-md-3">
-                        <label class="form-label small" for="price-<?= (int) $item['id'] ?>">Price (₱ per <?= e($item['unit']) ?>)</label>
-                        <input type="number" id="price-<?= (int) $item['id'] ?>" name="price" min="0.01" step="0.01"
-                               value="<?= e($item['price']) ?>" class="form-control">
-                    </div>
-                    <div class="col-4 col-md-3">
-                        <label class="form-label small" for="thr-<?= (int) $item['id'] ?>">Low-stock alert at</label>
-                        <input type="number" id="thr-<?= (int) $item['id'] ?>" name="low_stock_threshold" min="0" step="1"
-                               value="<?= (int) $item['low_stock_threshold'] ?>" class="form-control">
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <button type="submit" class="btn btn-primary w-100">Save</button>
-                    </div>
-                </form>
-                <!-- A separate form, because HTML forms can't be put inside each other -->
-                <form method="post" action="<?= e(url('pharmacy/stock.php')) ?>"
-                      onsubmit="return confirm('Remove this medicine from your list?');">
-                    <?= csrf_field() ?>
-                    <input type="hidden" name="action" value="remove">
-                    <input type="hidden" name="stock_id" value="<?= (int) $item['id'] ?>">
-                    <button type="submit" class="btn btn-outline-danger">Remove</button>
-                </form>
-            </div>
-        </div>
-    <?php endforeach; ?>
-</div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
+        <p class="small text-muted mb-0">Saving a row sets its “Last updated” to now. Nothing changed? Confirm everything at once:</p>
+        <form method="post" action="<?= e(url('pharmacy/stock.php')) ?>">
+            <?= csrf_field() ?>
+            <input type="hidden" name="action" value="confirm_all">
+            <button type="submit" class="btn btn-outline-primary">Confirm all are still correct</button>
+        </form>
+    </div>
+<?php endif; ?>
 
 <?php require __DIR__ . '/../includes/footer.php'; ?>
